@@ -2,20 +2,23 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
+use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 
-class User extends Authenticatable implements FilamentUser, MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, HasTenants, MustVerifyEmail
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    /** @use HasFactory<UserFactory> */
+    use HasFactory;
+    use Notifiable;
 
     /**
      * The attributes that should be hidden for serialization.
@@ -44,7 +47,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     {
         return match ($panel->getId()) {
             'admin' => $this->roles->contains('name', 'Admin'),
-            'operator' => false,
             default => true,
         };
     }
@@ -52,5 +54,60 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class);
+    }
+
+    public function operators(): BelongsToMany
+    {
+        return $this->belongsToMany(Operator::class)
+            ->withPivot(['role_id', 'joined_at'])
+            ->withTimestamps();
+    }
+
+    public function operatorsWithRole(string $roleName): BelongsToMany
+    {
+        return $this->operators()
+            ->whereExists(function ($query) use ($roleName): void {
+                $query->select('*')
+                    ->from('roles')
+                    ->whereColumn('roles.id', 'operator_user.role_id')
+                    ->where('roles.name', $roleName);
+            });
+    }
+
+    public function operatorsAsAdmin(): BelongsToMany
+    {
+        return $this->operatorsWithRole('Operator Admin');
+    }
+
+    public function belongsToOperator(int|Operator $operator): bool
+    {
+        $operatorId = $operator instanceof Operator ? $operator->id : $operator;
+
+        return $this->operators()->where('operator_id', $operatorId)->exists();
+    }
+
+    public function hasRoleInOperator(int|Operator $operator, string $roleName): bool
+    {
+        $operatorId = $operator instanceof Operator ? $operator->id : $operator;
+
+        return $this->operators()
+            ->where('operator_id', $operatorId)
+            ->whereExists(function ($query) use ($roleName): void {
+                $query->select('*')
+                    ->from('roles')
+                    ->whereColumn('roles.id', 'operator_user.role_id')
+                    ->where('roles.name', $roleName);
+            })
+            ->exists();
+    }
+
+    public function getTenants(Panel $panel): Collection
+    {
+        return $this->operators;
+    }
+
+    public function canAccessTenant(Model $tenant): bool
+    {
+        return $this->belongsToOperator($tenant);
     }
 }

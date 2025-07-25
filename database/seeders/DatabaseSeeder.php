@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Operator;
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -14,19 +16,45 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        $user = User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Call the role permission seeder first
+        $this->call([
+            RolePermissionSeeder::class,
         ]);
 
-        $role = Role::create([
-            'name' => 'Admin',
-            'created_by' => 1,
-            'is_default' => true,
+        // Create a test admin user
+        $adminUser = User::factory()->create([
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
         ]);
 
-        $user->roles()->attach($role->id);
+        // Assign admin role to the user
+        $adminRole = Role::where('name', 'Admin')->first();
+        $adminUser->roles()->attach($adminRole->id);
+
+        // Create a test regular user
+        $regularUser = User::factory()->create([
+            'name' => 'Regular User',
+            'email' => 'user@example.com',
+        ]);
+
+        // Assign user role to the regular user
+        $userRole = Role::where('name', 'User')->first();
+        $regularUser->roles()->attach($userRole->id);
+
+        // Create an user with an operator
+        $operatorUser = User::factory()->create([
+            'name' => 'Operator User',
+            'email' => 'operator@example.com',
+        ]);
+        Operator::factory()->create([]);
+        // Assign operator admin role to the operator user
+        $operatorRole = Role::where('name', 'Operator Admin')->first();
+        $operatorUser->roles()->attach($operatorRole->id);
+
+        $this->command->info('Database seeded successfully!');
+        $this->command->info('Admin user: admin@example.com');
+        $this->command->info('Regular user: user@example.com');
+        $this->command->info('Operator user: operator@example.com');
+        $this->command->info('Default password: password');
     }
 }

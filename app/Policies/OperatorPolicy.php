@@ -42,6 +42,7 @@ class OperatorPolicy
         if ($user->belongsToOperator($operator)) {
             return true;
         }
+
         return (bool) $user->roles->contains('name', 'Admin');
     }
 

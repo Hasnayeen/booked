@@ -49,6 +49,8 @@ class AppPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->strictAuthorization()
+            ->databaseNotifications();
     }
 }

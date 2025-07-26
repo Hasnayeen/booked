@@ -2,10 +2,10 @@
 
 namespace App\Notifications;
 
-use DateTime;
-use DateInterval;
 use App\Models\Operator;
 use App\Models\User;
+use DateInterval;
+use DateTime;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -51,7 +51,7 @@ class NewOperatorRegistration extends Notification implements ShouldQueue
             ->line('• **Contact Phone:** ' . ($this->operator->contact_phone ?? 'Not provided'))
             ->line("• **Registered By:** {$this->registeredBy->name} ({$this->registeredBy->email})")
             ->line('• **Registration Date:** ' . $this->operator->created_at->format('M j, Y \a\t g:i A'))
-            ->when($this->operator->description, fn($message) => $message
+            ->when($this->operator->description, fn ($message) => $message
                 ->line('**Description:**')
                 ->line($this->operator->description))
             ->line('Please review this registration and update the operator status accordingly.')

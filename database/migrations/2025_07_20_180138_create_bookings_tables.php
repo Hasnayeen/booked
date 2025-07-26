@@ -57,7 +57,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('operator_id')->constrained()->onDelete('cascade');
             $table->string('bus_number');
-            $table->string('type'); // standard, luxury, sleeper, etc.
+            $table->string('category'); // standard, luxury, sleeper, custom
+            $table->string('type'); // ac, non_ac
             $table->integer('total_seats');
             $table->string('license_plate')->nullable();
             $table->boolean('is_active')->default(true);
@@ -68,6 +69,7 @@ return new class extends Migration
             // Ensure bus numbers are unique per operator
             $table->unique(['operator_id', 'bus_number']);
             $table->index('operator_id');
+            $table->index('category');
             $table->index('type');
         });
 

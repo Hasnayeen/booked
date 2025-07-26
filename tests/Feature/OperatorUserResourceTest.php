@@ -1,10 +1,10 @@
 <?php
 
-use Filament\Schemas\Schema;
 use App\Filament\Operator\Resources\UserResource;
 use App\Models\Operator;
 use App\Models\Role;
 use App\Models\User;
+use Filament\Schemas\Schema;
 
 describe('Operator User Management Resource', function (): void {
     beforeEach(function (): void {

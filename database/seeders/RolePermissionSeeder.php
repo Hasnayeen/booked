@@ -19,32 +19,23 @@ class RolePermissionSeeder extends Seeder
             'manage_users' => 'Can manage system users',
             'view_reports' => 'Can view system reports',
             'manage_settings' => 'Can manage system settings',
+            'bus_manage' => 'Can manage buses for an operator',
         ];
 
-        foreach (array_keys($permissions) as $name) {
-            Permission::firstOrCreate(['name' => $name]);
+        foreach ($permissions as $name => $description) {
+            Permission::firstOrCreate(['name' => $name, 'description' => $description]);
         }
 
         // Create Admin role
         $adminRole = Role::firstOrCreate([
             'name' => 'Admin',
         ], [
-            'is_default' => false,
+            'is_default' => true,
         ]);
 
         // Attach all permissions to Admin role
         $allPermissions = Permission::all();
         $adminRole->permissions()->sync($allPermissions->pluck('id'));
-
-        // Create Operator Manager role (can only approve operators)
-        $operatorManagerRole = Role::firstOrCreate([
-            'name' => 'Operator Manager',
-        ], [
-            'is_default' => false,
-        ]);
-
-        $approvePermission = Permission::where('name', 'approve_operator')->first();
-        $operatorManagerRole->permissions()->sync([$approvePermission->id]);
 
         // Create User role (default for new users)
         $userRole = Role::firstOrCreate([
@@ -57,28 +48,23 @@ class RolePermissionSeeder extends Seeder
         $userRole->permissions()->sync([]);
 
         // Create Operator-specific roles
-        Role::firstOrCreate([
+        $operatorAdminRole = Role::firstOrCreate([
             'name' => 'Operator Admin',
         ], [
-            'is_default' => false,
+            'is_default' => true,
         ]);
 
-        Role::firstOrCreate([
-            'name' => 'Operator Member',
-        ], [
-            'is_default' => false,
+        $operatorAdminRole->permissions()->sync([
+            Permission::where('name', 'bus_manage')->first()->id,
         ]);
 
-        Role::firstOrCreate([
+        $operatorStaffRole = Role::firstOrCreate([
             'name' => 'Operator Staff',
         ], [
-            'is_default' => false,
+            'is_default' => true,
         ]);
-
-        Role::firstOrCreate([
-            'name' => 'Operator Viewer',
-        ], [
-            'is_default' => false,
+        $operatorStaffRole->permissions()->sync([
+            Permission::where('name', 'bus_manage')->first()->id,
         ]);
 
         $this->command->info('Roles and permissions seeded successfully!');

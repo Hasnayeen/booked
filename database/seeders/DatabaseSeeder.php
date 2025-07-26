@@ -42,14 +42,13 @@ class DatabaseSeeder extends Seeder
         $regularUser->roles()->attach($userRole->id);
 
         // Create an user with an operator
+        $operatorRole = Role::where('name', 'Operator Admin')->first();
         $operatorUser = User::factory()->create([
             'name' => 'Operator User',
             'email' => 'operator@example.com',
         ]);
-        Operator::factory()->create([]);
-        // Assign operator admin role to the operator user
-        $operatorRole = Role::where('name', 'Operator Admin')->first();
-        $operatorUser->roles()->attach($operatorRole->id);
+        $operator = Operator::factory()->create();
+        $operatorUser->operators()->attach($operator->id, ['role_id' => $operatorRole->id]);
 
         $this->command->info('Database seeded successfully!');
         $this->command->info('Admin user: admin@example.com');

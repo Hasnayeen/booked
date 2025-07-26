@@ -2,9 +2,9 @@
 
 namespace App\Notifications;
 
-use DateTime;
-use DateInterval;
 use App\Models\Operator;
+use DateInterval;
+use DateTime;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;

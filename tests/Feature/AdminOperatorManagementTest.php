@@ -84,7 +84,7 @@ describe('Admin Operator Management', function (): void {
         Notification::assertSentTo(
             [$operator->contact_email],
             OperatorStatusUpdate::class,
-            fn($notification): bool => $notification->operator->id === $operator->id
+            fn ($notification): bool => $notification->operator->id === $operator->id
                 && $notification->newStatus === OperatorStatus::APPROVED,
         );
     });
@@ -109,7 +109,7 @@ describe('Admin Operator Management', function (): void {
         Notification::assertSentTo(
             [$operator->contact_email],
             OperatorStatusUpdate::class,
-            fn($notification): bool => $notification->operator->id === $operator->id
+            fn ($notification): bool => $notification->operator->id === $operator->id
                 && $notification->newStatus === OperatorStatus::REJECTED,
         );
     });
@@ -134,7 +134,7 @@ describe('Admin Operator Management', function (): void {
         Notification::assertSentTo(
             [$operator->contact_email],
             OperatorStatusUpdate::class,
-            fn($notification): bool => $notification->operator->id === $operator->id
+            fn ($notification): bool => $notification->operator->id === $operator->id
                 && $notification->newStatus === OperatorStatus::SUSPENDED,
         );
     });

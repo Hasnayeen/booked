@@ -1,13 +1,12 @@
 <?php
 
-use Filament\Facades\Filament;
+use App\Filament\Operator\Resources\UserResource\Pages\EditUser;
 use App\Filament\Operator\Resources\UserResource\Pages\ListUsers;
 use App\Filament\Operator\Resources\UserResource\Pages\ViewUser;
-use App\Filament\Operator\Resources\UserResource\Pages\EditUser;
-use App\Filament\Operator\Resources\UserResource;
 use App\Models\Operator;
 use App\Models\Role;
 use App\Models\User;
+use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;

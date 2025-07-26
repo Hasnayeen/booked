@@ -59,6 +59,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants, MustVeri
     public function operators(): BelongsToMany
     {
         return $this->belongsToMany(Operator::class)
+            ->using(OperatorUser::class)
             ->withPivot(['role_id', 'joined_at'])
             ->withTimestamps();
     }
@@ -99,6 +100,21 @@ class User extends Authenticatable implements FilamentUser, HasTenants, MustVeri
                     ->where('roles.name', $roleName);
             })
             ->exists();
+    }
+
+    public function getRoleInOperator(int|Operator $operator): ?Role
+    {
+        $operatorId = $operator instanceof Operator ? $operator->id : $operator;
+
+        return OperatorUser::where('user_id', $this->id)
+            ->where('operator_id', $operatorId)
+            ->with('role')
+            ->first()?->role;
+    }
+
+    public function hasPermissionInOperator(int|Operator $operator, string $permissionName): bool
+    {
+        return $this->getRoleInOperator($operator)?->permissions->pluck('name')->contains($permissionName);
     }
 
     public function getTenants(Panel $panel): Collection

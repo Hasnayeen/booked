@@ -23,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
         Model::unguard();
         if (! app()->isProduction()) {
             Model::preventLazyLoading();
+            Model::automaticallyEagerLoadRelationships();
             Model::preventSilentlyDiscardingAttributes();
             Model::preventAccessingMissingAttributes();
         }

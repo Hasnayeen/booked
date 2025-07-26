@@ -2,8 +2,8 @@
 
 namespace Tests;
 
-use Illuminate\Contracts\Console\Kernel;
 use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase

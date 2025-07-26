@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('operator_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
+            $table->foreignId('role_id')->nullable()->constrained('roles')->nullOnDelete();
             $table->timestamp('joined_at')->useCurrent();
             $table->timestamps();
 

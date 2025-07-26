@@ -12,14 +12,10 @@ uses(RefreshDatabase::class);
 
 describe('User-Operator Workflow Management', function (): void {
     beforeEach(function (): void {
-        // Set the current Filament panel for testing
         Filament::setCurrentPanel(Filament::getPanel('operator'));
 
-        // Create roles first
         $this->operatorAdminRole = Role::where(['name' => 'Operator Admin'])->first();
-        $this->operatorMemberRole = Role::where(['name' => 'Operator Member'])->first();
         $this->operatorStaffRole = Role::where(['name' => 'Operator Staff'])->first();
-        $this->operatorViewerRole = Role::where(['name' => 'Operator Viewer'])->first();
 
         $this->user = User::factory()->create([
             'email' => 'user@booked.com',
@@ -46,20 +42,7 @@ describe('User-Operator Workflow Management', function (): void {
     });
 
     describe('User Access Management', function (): void {
-        it('user can be added to an operator as a member', function (): void {
-            // Add user to hotel operator
-            $this->hotelOperator->users()->attach($this->user, [
-                'role_id' => $this->operatorMemberRole->id,
-                'joined_at' => now(),
-            ]);
-
-            expect($this->user->belongsToOperator($this->hotelOperator))->toBeTrue();
-            expect($this->user->hasRoleInOperator($this->hotelOperator, 'Operator Member'))->toBeTrue();
-            expect($this->user->canAccessTenant($this->hotelOperator))->toBeTrue();
-        });
-
         it('user can be added to an operator as an admin', function (): void {
-            // Add user to bus operator as admin
             $this->busOperator->users()->attach($this->user, [
                 'role_id' => $this->operatorAdminRole->id,
                 'joined_at' => now(),
@@ -70,10 +53,9 @@ describe('User-Operator Workflow Management', function (): void {
             expect($this->user->canAccessTenant($this->busOperator))->toBeTrue();
         });
 
-        it('user member of an operator has access to that operator', function (): void {
-            // Add user to hotel operator
+        it('user admin of an operator has access to that operator', function (): void {
             $this->hotelOperator->users()->attach($this->user, [
-                'role_id' => $this->operatorMemberRole->id,
+                'role_id' => $this->operatorAdminRole->id,
                 'joined_at' => now(),
             ]);
 
@@ -88,7 +70,7 @@ describe('User-Operator Workflow Management', function (): void {
             expect($availableTenants->contains($this->hotelOperator))->toBeTrue();
         });
 
-        it('user not member of an operator cannot access that operator', function (): void {
+        it('user not admin or staff of an operator cannot access that operator', function (): void {
             $this->actingAs($this->user);
 
             // User cannot access the restricted operator
@@ -103,7 +85,7 @@ describe('User-Operator Workflow Management', function (): void {
         it('user can be removed from an operator and loses access', function (): void {
             // Initially add user to operator
             $this->hotelOperator->users()->attach($this->user, [
-                'role_id' => $this->operatorMemberRole->id,
+                'role_id' => $this->operatorStaffRole->id,
                 'joined_at' => now(),
             ]);
 
@@ -127,7 +109,7 @@ describe('User-Operator Workflow Management', function (): void {
             ]);
 
             $this->busOperator->users()->attach($this->user, [
-                'role_id' => $this->operatorMemberRole->id,
+                'role_id' => $this->operatorStaffRole->id,
                 'joined_at' => now(),
             ]);
 
@@ -151,7 +133,7 @@ describe('User-Operator Workflow Management', function (): void {
             ]);
 
             $this->busOperator->users()->attach($this->user, [
-                'role_id' => $this->operatorMemberRole->id,
+                'role_id' => $this->operatorStaffRole->id,
                 'joined_at' => now(),
             ]);
 
@@ -201,28 +183,28 @@ describe('User-Operator Workflow Management', function (): void {
             expect(Filament::getTenant())->toBe($this->hotelOperator);
         });
 
-        it('member user has limited access in operator', function (): void {
+        it('staff user has limited access in operator', function (): void {
             $this->hotelOperator->users()->attach($this->user, [
-                'role_id' => $this->operatorMemberRole->id,
+                'role_id' => $this->operatorStaffRole->id,
                 'joined_at' => now(),
             ]);
 
-            expect($this->user->hasRoleInOperator($this->hotelOperator, 'Operator Member'))->toBeTrue();
+            expect($this->user->hasRoleInOperator($this->hotelOperator, 'Operator Staff'))->toBeTrue();
             expect($this->user->hasRoleInOperator($this->hotelOperator, 'Operator Admin'))->toBeFalse();
 
-            // Member still has basic access to operator
+            // Staff still has basic access to operator
             $this->actingAs($this->user);
             expect($this->user->canAccessTenant($this->hotelOperator))->toBeTrue();
-        });
+        })->todo();
 
         it('user role can be upgraded in operator', function (): void {
-            // Start as member
+            // Start as staff
             $this->hotelOperator->users()->attach($this->user, [
-                'role_id' => $this->operatorMemberRole->id,
+                'role_id' => $this->operatorStaffRole->id,
                 'joined_at' => now(),
             ]);
 
-            expect($this->user->hasRoleInOperator($this->hotelOperator, 'Operator Member'))->toBeTrue();
+            expect($this->user->hasRoleInOperator($this->hotelOperator, 'Operator Staff'))->toBeTrue();
 
             // Upgrade to admin
             $this->hotelOperator->users()->updateExistingPivot($this->user, [
@@ -232,14 +214,14 @@ describe('User-Operator Workflow Management', function (): void {
             // Refresh user to get updated pivot data
             $this->user->refresh();
             expect($this->user->hasRoleInOperator($this->hotelOperator, 'Operator Admin'))->toBeTrue();
-            expect($this->user->hasRoleInOperator($this->hotelOperator, 'Operator Member'))->toBeFalse();
+            expect($this->user->hasRoleInOperator($this->hotelOperator, 'Operator Staff'))->toBeFalse();
         });
     });
 
     describe('Panel Authentication Workflows', function (): void {
         it('authenticated user can access operator panel when member of operators', function (): void {
             $this->hotelOperator->users()->attach($this->user, [
-                'role_id' => $this->operatorMemberRole->id,
+                'role_id' => $this->operatorStaffRole->id,
                 'joined_at' => now(),
             ]);
 

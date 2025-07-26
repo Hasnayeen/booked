@@ -58,6 +58,7 @@ class OperatorPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->strictAuthorization();
+            ->strictAuthorization()
+            ->databaseNotifications();
     }
 }

@@ -75,9 +75,13 @@ describe('Operator Bus Management', function (): void {
         it('can list buses through filament admin panel', function (): void {
             $this->actingAs($this->staffUser);
 
-            livewire(ListBuses::class, ['operator' => $this->operator])
-                ->assertCanSeeTableRecords([$this->bus])
-                ->assertCanNotSeeTableRecords([$this->otherBus]);
+            $this->get(route('filament.operator.resources.buses.index', ['tenant' => $this->operator]))
+                ->assertSuccessful()
+                ->assertSee($this->bus->bus_number)
+                ->assertSee($this->bus->category->value)
+                ->assertSee($this->bus->type->value)
+                ->assertSee($this->bus->total_seats)
+                ->assertDontSee($this->otherBus->bus_number);
         });
 
         it('can filter buses by category through filament admin panel', function (): void {

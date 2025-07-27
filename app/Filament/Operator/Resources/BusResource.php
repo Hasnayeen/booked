@@ -173,11 +173,6 @@ class BusResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->where('operator_id', filament()->getTenant()->id);
-    }
-
     public static function getRelations(): array
     {
         return [

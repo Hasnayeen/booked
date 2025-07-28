@@ -8,38 +8,38 @@ use Filament\Support\Contracts\HasLabel;
 
 enum BusCategory: string implements HasColor, HasIcon, HasLabel
 {
-    case STANDARD = 'standard';
+    case Economy = 'economy';
     case LUXURY = 'luxury';
     case SLEEPER = 'sleeper';
-    case CUSTOM = 'custom';
+    case BUSINESS = 'business';
 
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::STANDARD => 'Standard',
+            self::Economy => 'Economy',
             self::LUXURY => 'Luxury',
             self::SLEEPER => 'Sleeper',
-            self::CUSTOM => 'Custom',
+            self::BUSINESS => 'Business',
         };
     }
 
     public function getIcon(): ?string
     {
         return match ($this) {
-            self::STANDARD => 'heroicon-o-squares-2x2',
-            self::LUXURY => 'heroicon-o-star',
-            self::SLEEPER => 'heroicon-o-moon',
-            self::CUSTOM => 'heroicon-o-cog-6-tooth',
+            self::Economy => 'lucide-coins',
+            self::LUXURY => 'lucide-gem',
+            self::SLEEPER => 'lucide-bed',
+            self::BUSINESS => 'lucide-briefcase-business',
         };
     }
 
     public function getColor(): string|array|null
     {
         return match ($this) {
-            self::STANDARD => 'gray',
-            self::LUXURY => 'warning',
+            self::Economy => 'gray',
+            self::LUXURY => 'danger',
             self::SLEEPER => 'info',
-            self::CUSTOM => 'success',
+            self::BUSINESS => 'success',
         };
     }
 }

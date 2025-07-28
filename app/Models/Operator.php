@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Operator extends Model implements HasName
+class Operator extends Model
 {
     use HasFactory;
 
@@ -90,8 +90,8 @@ class Operator extends Model implements HasName
         return $this->usersWithRole('Operator Member');
     }
 
-    public function getFilamentName(): string
-    {
-        return "{$this->name} ({$this->type->label()})";
-    }
+    // public function getFilamentName(): string
+    // {
+    //     return "{$this->name} ({$this->type->label()})";
+    // }
 }

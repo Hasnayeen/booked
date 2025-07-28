@@ -33,6 +33,7 @@ class EditOperatorProfile extends EditTenantProfile
     public function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(2)
             ->components([
                 TextInput::make('name')
                     ->label('Operator Name')
@@ -43,11 +44,11 @@ class EditOperatorProfile extends EditTenantProfile
                 Select::make('type')
                     ->label('Operator Type')
                     ->required()
+                    ->disabled()
                     ->options([
                         OperatorType::HOTEL->value => 'Hotel Operator',
                         OperatorType::BUS->value => 'Bus Operator',
                     ])
-                    ->native(false)
                     ->helperText('The type of service you provide'),
 
                 TextInput::make('contact_email')
@@ -67,7 +68,9 @@ class EditOperatorProfile extends EditTenantProfile
 
                 Textarea::make('description')
                     ->label('Description')
+                    ->columnSpanFull()
                     ->nullable()
+                    ->autosize()
                     ->maxLength(1000)
                     ->rows(4)
                     ->helperText('Brief description of your operator services'),

@@ -13,6 +13,8 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -33,9 +35,12 @@ class OperatorPanelProvider extends PanelProvider
             ->tenant(Operator::class)
             ->tenantRegistration(RegisterOperator::class)
             ->tenantProfile(EditOperatorProfile::class)
+            ->brandLogo(asset('logo.svg'))
             ->colors([
-                'primary' => Color::Lime,
+                'primary' => Color::Cyan,
             ])
+            ->viteTheme('resources/css/filament/operator/theme.css')
+            ->sidebarWidth('18rem')
             ->discoverResources(in: app_path('Filament/Operator/Resources'), for: 'App\Filament\Operator\Resources')
             ->discoverPages(in: app_path('Filament/Operator/Pages'), for: 'App\Filament\Operator\Pages')
             ->pages([
@@ -60,5 +65,21 @@ class OperatorPanelProvider extends PanelProvider
             ])
             ->strictAuthorization()
             ->databaseNotifications();
+    }
+
+    public function boot(): void
+    {
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::PAGE_START,
+            fn () => view('filament.operator.hooks.tenant-sidebar')
+        );
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::SIDEBAR_NAV_START,
+            fn () => view('filament.operator.hooks.global-search')
+        );
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::PAGE_START,
+            fn () => view('filament.operator.hooks.user-menu')
+        );
     }
 }

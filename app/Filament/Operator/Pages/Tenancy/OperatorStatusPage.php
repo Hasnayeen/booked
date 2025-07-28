@@ -51,7 +51,6 @@ class OperatorStatusPage extends Page implements HasSchemas
                                 TextEntry::make('description')
                                     ->hiddenLabel()
                                     ->state(fn (): string => $this->getStatusDescription())
-                                    ->extraAttributes(['class' => 'text-center text-gray-600 max-w-2xl mx-auto'])
                                     ->columnSpanFull(),
                             ])
                             ->columns(1),
@@ -91,7 +90,7 @@ class OperatorStatusPage extends Page implements HasSchemas
                                     ->state(fn (): array => $this->getNextSteps())
                                     ->bulleted()
                                     ->listWithLineBreaks()
-                                    ->extraAttributes(['class' => 'whitespace-pre-line'])
+                                    ->extraAttributes(['class' => 'text-gray-600 list-disc list-inside'])
                                     ->columnSpanFull(),
                             ]),
 
@@ -101,7 +100,7 @@ class OperatorStatusPage extends Page implements HasSchemas
                                 TextEntry::make('support_text')
                                     ->hiddenLabel()
                                     ->state(fn (): string => 'If you have questions about your operator status or need assistance, please contact our support team at support@booked.com or visit our help center.')
-                                    ->extraAttributes(['class' => 'text-gray-600'])
+                                    ->extraAttributes(['class' => 'text-gray-700'])
                                     ->columnSpanFull(),
                             ]),
                     ]),

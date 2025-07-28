@@ -12,19 +12,16 @@ use function Pest\Livewire\livewire;
 
 describe('Operator Profile Management', function (): void {
     beforeEach(function (): void {
-        // Set the current Filament panel for testing
         Filament::setCurrentPanel(Filament::getPanel('operator'));
 
-        // Create a test user
         $this->user = User::factory()->create([
             'email' => 'operator@booked.com',
             'email_verified_at' => now(),
         ]);
 
-        // Create an approved operator
         $this->operator = Operator::factory()->create([
-            'status' => OperatorStatus::APPROVED,
-            'type' => OperatorType::HOTEL,
+            'status' => OperatorStatus::Approved,
+            'type' => OperatorType::Hotel,
             'name' => 'Test Hotel',
             'contact_email' => 'hotel@example.com',
             'contact_phone' => '+1234567890',
@@ -35,13 +32,10 @@ describe('Operator Profile Management', function (): void {
             'name' => 'Operator Admin',
         ])->first();
 
-        // Associate user with operator
         $this->operator->users()->attach($this->user, ['role_id' => $this->role->id, 'joined_at' => now()]);
 
-        // Authenticate the user first
         $this->actingAs($this->user);
 
-        // Set current tenant after authentication
         Filament::setTenant($this->operator);
     });
 
@@ -58,7 +52,7 @@ describe('Operator Profile Management', function (): void {
         ])
             ->assertSchemaStateSet([
                 'name' => 'Test Hotel',
-                'type' => OperatorType::HOTEL->value,
+                'type' => OperatorType::Hotel->value,
                 'contact_email' => 'hotel@example.com',
                 'contact_phone' => '+1234567890',
                 'description' => 'A test hotel operator',
@@ -68,7 +62,7 @@ describe('Operator Profile Management', function (): void {
     it('can update operator profile', function (): void {
         $newData = [
             'name' => 'Updated Hotel Name',
-            'type' => OperatorType::BUS->value,
+            'type' => OperatorType::Bus->value,
             'contact_email' => 'updated@example.com',
             'contact_phone' => '+9876543210',
             'description' => 'Updated description for the operator',
@@ -85,10 +79,32 @@ describe('Operator Profile Management', function (): void {
 
         expect($this->operator)
             ->name->toBe('Updated Hotel Name')
-            ->type->toBe(OperatorType::BUS)
             ->contact_email->toBe('updated@example.com')
             ->contact_phone->toBe('+9876543210')
             ->description->toBe('Updated description for the operator');
+    });
+
+    it('can not change operator category', function (): void {
+        $newData = [
+            'name' => 'Updated Hotel Name',
+            'type' => OperatorType::Bus->value,
+            'contact_email' => 'updated@example.com',
+            'contact_phone' => '+9876543210',
+            'description' => 'Updated description for the operator',
+        ];
+
+        livewire(EditOperatorProfile::class, [
+            'record' => $this->operator->getKey(),
+        ])
+            ->fillForm($newData)
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->operator->refresh();
+
+        expect($this->operator)
+            ->type->not->toBe(OperatorType::Bus)
+            ->type->toBe(OperatorType::Hotel);
     });
 
     it('validates required fields', function (): void {
@@ -127,7 +143,7 @@ describe('Operator Profile Management', function (): void {
         // Create another operator with a different email
         $otherOperator = Operator::factory()->create([
             'contact_email' => 'other@example.com',
-            'status' => OperatorStatus::APPROVED,
+            'status' => OperatorStatus::Approved,
         ]);
 
         livewire(EditOperatorProfile::class, [

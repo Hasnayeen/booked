@@ -62,7 +62,7 @@ class BusFactory extends Factory
     public function ac(): static
     {
         return $this->state(fn (array $attributes): array => [
-            'type' => BusType::AC,
+            'type' => BusType::Ac,
         ]);
     }
 
@@ -72,7 +72,7 @@ class BusFactory extends Factory
     public function nonAc(): static
     {
         return $this->state(fn (array $attributes): array => [
-            'type' => BusType::NON_AC,
+            'type' => BusType::NonAc,
         ]);
     }
 
@@ -82,7 +82,7 @@ class BusFactory extends Factory
     public function luxury(): static
     {
         return $this->state(fn (array $attributes): array => [
-            'category' => BusCategory::LUXURY,
+            'category' => BusCategory::Luxury,
             'total_seats' => fake()->numberBetween(20, 40), // Luxury buses have fewer seats
             'amenities' => [
                 'WiFi',
@@ -107,7 +107,7 @@ class BusFactory extends Factory
     public function sleeper(): static
     {
         return $this->state(fn (array $attributes): array => [
-            'category' => BusCategory::SLEEPER,
+            'category' => BusCategory::Sleeper,
             'total_seats' => fake()->numberBetween(24, 36), // Sleeper buses have berths
             'amenities' => [
                 'Sleeping Berths',
@@ -130,7 +130,7 @@ class BusFactory extends Factory
     public function standard(): static
     {
         return $this->state(fn (array $attributes): array => [
-            'category' => BusCategory::STANDARD,
+            'category' => BusCategory::Economy,
             'total_seats' => fake()->numberBetween(40, 60), // Standard buses have more seats
             'amenities' => [
                 'Comfortable Seats',

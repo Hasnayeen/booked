@@ -44,10 +44,10 @@ class OperatorStatusUpdate extends Notification implements ShouldQueue
             ->line("Your {$this->operator->type->label()} operator '{$this->operator->name}' status has been updated.");
 
         return match ($this->operator->status) {
-            OperatorStatus::APPROVED => $this->buildApprovedMessage($message),
-            OperatorStatus::SUSPENDED => $this->buildSuspendedMessage($message),
-            OperatorStatus::REJECTED => $this->buildRejectedMessage($message),
-            OperatorStatus::PENDING => $this->buildPendingMessage($message),
+            OperatorStatus::Approved => $this->buildApprovedMessage($message),
+            OperatorStatus::Suspended => $this->buildSuspendedMessage($message),
+            OperatorStatus::Rejected => $this->buildRejectedMessage($message),
+            OperatorStatus::Pending => $this->buildPendingMessage($message),
         };
     }
 
@@ -144,10 +144,10 @@ class OperatorStatusUpdate extends Notification implements ShouldQueue
     private function getStatusUpdateMessage(): string
     {
         return match ($this->operator->status) {
-            OperatorStatus::APPROVED => 'Your operator registration has been approved! Welcome to Booked.',
-            OperatorStatus::SUSPENDED => 'Your operator account has been temporarily suspended.',
-            OperatorStatus::REJECTED => 'Your operator registration could not be approved at this time.',
-            OperatorStatus::PENDING => 'Your operator status is now under review.',
+            OperatorStatus::Approved => 'Your operator registration has been approved! Welcome to Booked.',
+            OperatorStatus::Suspended => 'Your operator account has been temporarily suspended.',
+            OperatorStatus::Rejected => 'Your operator registration could not be approved at this time.',
+            OperatorStatus::Pending => 'Your operator status is now under review.',
         };
     }
 }

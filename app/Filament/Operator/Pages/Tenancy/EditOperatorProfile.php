@@ -46,8 +46,8 @@ class EditOperatorProfile extends EditTenantProfile
                     ->required()
                     ->disabled()
                     ->options([
-                        OperatorType::HOTEL->value => 'Hotel Operator',
-                        OperatorType::BUS->value => 'Bus Operator',
+                        OperatorType::Hotel->value => 'Hotel Operator',
+                        OperatorType::Bus->value => 'Bus Operator',
                     ])
                     ->helperText('The type of service you provide'),
 

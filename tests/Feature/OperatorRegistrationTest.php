@@ -21,7 +21,7 @@ describe('Operator Registration', function (): void {
     it('can register an operator with required information', function (): void {
         $newOperatorData = Operator::factory()->make([
             'name' => 'Sunshine Hotel Group',
-            'type' => OperatorType::HOTEL,
+            'type' => OperatorType::Hotel,
             'contact_email' => 'contact@sunshinehotels.com',
         ]);
 
@@ -38,7 +38,7 @@ describe('Operator Registration', function (): void {
         $this->assertDatabaseHas('operators', [
             'name' => $newOperatorData->name,
             'type' => $newOperatorData->type->value,
-            'status' => OperatorStatus::PENDING->value,
+            'status' => OperatorStatus::Pending->value,
             'contact_email' => $newOperatorData->contact_email,
         ]);
     });
@@ -46,7 +46,7 @@ describe('Operator Registration', function (): void {
     it('can register an operator with optional information', function (): void {
         $newOperatorData = Operator::factory()->make([
             'name' => 'Express Bus Lines',
-            'type' => OperatorType::BUS,
+            'type' => OperatorType::Bus,
             'contact_email' => 'info@expressbuslines.com',
             'contact_phone' => '+1-555-123-4567',
             'description' => 'Premium intercity bus service connecting major cities.',
@@ -67,7 +67,7 @@ describe('Operator Registration', function (): void {
         $this->assertDatabaseHas('operators', [
             'name' => $newOperatorData->name,
             'type' => $newOperatorData->type->value,
-            'status' => OperatorStatus::PENDING->value,
+            'status' => OperatorStatus::Pending->value,
             'contact_email' => $newOperatorData->contact_email,
             'contact_phone' => $newOperatorData->contact_phone,
             'description' => $newOperatorData->description,
@@ -77,7 +77,7 @@ describe('Operator Registration', function (): void {
     it('sends confirmation notification to user after registration', function (): void {
         $newOperatorData = Operator::factory()->make([
             'name' => 'City Transport Co.',
-            'type' => OperatorType::BUS,
+            'type' => OperatorType::Bus,
             'contact_email' => 'admin@citytransport.com',
         ]);
 
@@ -99,7 +99,7 @@ describe('Operator Registration', function (): void {
         livewire(RegisterOperator::class)
             ->fillForm([
                 'name' => '',
-                'type' => OperatorType::HOTEL->value,
+                'type' => OperatorType::Hotel->value,
                 'contact_email' => 'contact@example.com',
             ])
             ->call('register')
@@ -110,7 +110,7 @@ describe('Operator Registration', function (): void {
         livewire(RegisterOperator::class)
             ->fillForm([
                 'name' => 'Test Hotel',
-                'type' => OperatorType::HOTEL->value,
+                'type' => OperatorType::Hotel->value,
                 'contact_email' => 'invalid-email',
             ])
             ->call('register')

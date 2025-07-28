@@ -24,20 +24,20 @@ describe('User-Operator Workflow Management', function (): void {
 
         $this->hotelOperator = Operator::factory()->create([
             'name' => 'Grand Hotel',
-            'type' => OperatorType::HOTEL,
-            'status' => OperatorStatus::APPROVED,
+            'type' => OperatorType::Hotel,
+            'status' => OperatorStatus::Approved,
         ]);
 
         $this->busOperator = Operator::factory()->create([
             'name' => 'Express Bus Lines',
-            'type' => OperatorType::BUS,
-            'status' => OperatorStatus::APPROVED,
+            'type' => OperatorType::Bus,
+            'status' => OperatorStatus::Approved,
         ]);
 
         $this->restrictedOperator = Operator::factory()->create([
             'name' => 'VIP Resort',
-            'type' => OperatorType::HOTEL,
-            'status' => OperatorStatus::APPROVED,
+            'type' => OperatorType::Hotel,
+            'status' => OperatorStatus::Approved,
         ]);
     });
 
@@ -263,8 +263,8 @@ describe('User-Operator Workflow Management', function (): void {
         it('user can work for competing operators in different roles', function (): void {
             $competingHotel = Operator::factory()->create([
                 'name' => 'Luxury Resort',
-                'type' => OperatorType::HOTEL,
-                'status' => OperatorStatus::APPROVED,
+                'type' => OperatorType::Hotel,
+                'status' => OperatorStatus::Approved,
             ]);
 
             // User works as admin for one hotel

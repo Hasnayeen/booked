@@ -18,19 +18,19 @@ describe('Operator Notifications', function (): void {
         $admin->roles()->attach($adminRole);
 
         $operator = Operator::factory()->create([
-            'status' => OperatorStatus::PENDING,
+            'status' => OperatorStatus::Pending,
             'contact_email' => 'operator@example.com',
         ]);
 
         // Update the operator status
-        $operator->update(['status' => OperatorStatus::APPROVED]);
+        $operator->update(['status' => OperatorStatus::Approved]);
 
         // Create notification instance and test its properties
-        $notification = new OperatorStatusUpdate($operator, OperatorStatus::PENDING);
+        $notification = new OperatorStatusUpdate($operator, OperatorStatus::Pending);
 
         expect($notification->operator)->toBe($operator);
-        expect($notification->oldStatus)->toBe(OperatorStatus::PENDING);
-        expect($notification->operator->status)->toBe(OperatorStatus::APPROVED);
+        expect($notification->oldStatus)->toBe(OperatorStatus::Pending);
+        expect($notification->operator->status)->toBe(OperatorStatus::Approved);
 
         // Test notification data
         $arrayData = $notification->toArray($admin);
@@ -39,8 +39,8 @@ describe('Operator Notifications', function (): void {
         expect($arrayData)->toHaveKey('old_status');
         expect($arrayData)->toHaveKey('new_status');
         expect($arrayData['operator_id'])->toBe($operator->id);
-        expect($arrayData['new_status'])->toBe(OperatorStatus::APPROVED->value);
-        expect($arrayData['old_status'])->toBe(OperatorStatus::PENDING->value);
+        expect($arrayData['new_status'])->toBe(OperatorStatus::Approved->value);
+        expect($arrayData['old_status'])->toBe(OperatorStatus::Pending->value);
     });
 
     it('sends different notification types for different status changes', function (): void {
@@ -49,21 +49,21 @@ describe('Operator Notifications', function (): void {
         ]);
 
         // Test approval notification (operator status is now approved)
-        $operator->update(['status' => OperatorStatus::APPROVED]);
-        $approvalNotification = new OperatorStatusUpdate($operator, OperatorStatus::PENDING);
-        expect($approvalNotification->operator->status)->toBe(OperatorStatus::APPROVED);
-        expect($approvalNotification->oldStatus)->toBe(OperatorStatus::PENDING);
+        $operator->update(['status' => OperatorStatus::Approved]);
+        $approvalNotification = new OperatorStatusUpdate($operator, OperatorStatus::Pending);
+        expect($approvalNotification->operator->status)->toBe(OperatorStatus::Approved);
+        expect($approvalNotification->oldStatus)->toBe(OperatorStatus::Pending);
 
         // Test rejection notification
-        $operator->update(['status' => OperatorStatus::REJECTED]);
-        $rejectionNotification = new OperatorStatusUpdate($operator, OperatorStatus::PENDING);
-        expect($rejectionNotification->operator->status)->toBe(OperatorStatus::REJECTED);
-        expect($rejectionNotification->oldStatus)->toBe(OperatorStatus::PENDING);
+        $operator->update(['status' => OperatorStatus::Rejected]);
+        $rejectionNotification = new OperatorStatusUpdate($operator, OperatorStatus::Pending);
+        expect($rejectionNotification->operator->status)->toBe(OperatorStatus::Rejected);
+        expect($rejectionNotification->oldStatus)->toBe(OperatorStatus::Pending);
 
         // Test suspension notification
-        $operator->update(['status' => OperatorStatus::SUSPENDED]);
-        $suspensionNotification = new OperatorStatusUpdate($operator, OperatorStatus::APPROVED);
-        expect($suspensionNotification->operator->status)->toBe(OperatorStatus::SUSPENDED);
-        expect($suspensionNotification->oldStatus)->toBe(OperatorStatus::APPROVED);
+        $operator->update(['status' => OperatorStatus::Suspended]);
+        $suspensionNotification = new OperatorStatusUpdate($operator, OperatorStatus::Approved);
+        expect($suspensionNotification->operator->status)->toBe(OperatorStatus::Suspended);
+        expect($suspensionNotification->oldStatus)->toBe(OperatorStatus::Approved);
     });
 });

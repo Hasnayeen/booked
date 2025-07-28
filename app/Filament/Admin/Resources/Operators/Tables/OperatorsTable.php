@@ -33,18 +33,18 @@ class OperatorsTable
                 TextColumn::make('type')
                     ->badge()
                     ->color(fn (OperatorType $state): string => match ($state) {
-                        OperatorType::BUS => 'primary',
-                        OperatorType::HOTEL => 'success',
+                        OperatorType::Bus => 'primary',
+                        OperatorType::Hotel => 'success',
                     })
                     ->formatStateUsing(fn (OperatorType $state): string => $state->label()),
 
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (OperatorStatus $state): string => match ($state) {
-                        OperatorStatus::APPROVED => 'success',
-                        OperatorStatus::PENDING => 'warning',
-                        OperatorStatus::SUSPENDED => 'danger',
-                        OperatorStatus::REJECTED => 'gray',
+                        OperatorStatus::Approved => 'success',
+                        OperatorStatus::Pending => 'warning',
+                        OperatorStatus::Suspended => 'danger',
+                        OperatorStatus::Rejected => 'gray',
                     })
                     ->formatStateUsing(fn (OperatorStatus $state): string => $state->label()),
 
@@ -79,7 +79,7 @@ class OperatorsTable
                 Action::make('approve')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Operator $record): bool => $record->status === OperatorStatus::PENDING &&
+                    ->visible(fn (Operator $record): bool => $record->status === OperatorStatus::Pending &&
                         Auth::user()->roles()->whereHas('permissions', function (Builder $query): void {
                             $query->where('name', 'approve_operator');
                         })->exists(),
@@ -92,7 +92,7 @@ class OperatorsTable
                     ])
                     ->action(function (Operator $record, array $data): void {
                         $oldStatus = $record->status;
-                        $record->update(['status' => OperatorStatus::APPROVED]);
+                        $record->update(['status' => OperatorStatus::Approved]);
 
                         // Get all users associated with this operator
                         $operatorUsers = $record->users;
@@ -118,7 +118,7 @@ class OperatorsTable
                 Action::make('suspend')
                     ->icon('heroicon-o-pause-circle')
                     ->color('warning')
-                    ->visible(fn (Operator $record): bool => $record->status === OperatorStatus::APPROVED &&
+                    ->visible(fn (Operator $record): bool => $record->status === OperatorStatus::Approved &&
                         Auth::user()->roles()->whereHas('permissions', function (Builder $query): void {
                             $query->where('name', 'approve_operator');
                         })->exists(),
@@ -132,7 +132,7 @@ class OperatorsTable
                     ])
                     ->action(function (Operator $record, array $data): void {
                         $oldStatus = $record->status;
-                        $record->update(['status' => OperatorStatus::SUSPENDED]);
+                        $record->update(['status' => OperatorStatus::Suspended]);
 
                         // Get all users associated with this operator
                         $operatorUsers = $record->users;
@@ -158,7 +158,7 @@ class OperatorsTable
                 Action::make('reject')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (Operator $record): bool => $record->status === OperatorStatus::PENDING &&
+                    ->visible(fn (Operator $record): bool => $record->status === OperatorStatus::Pending &&
                         Auth::user()->roles()->whereHas('permissions', function (Builder $query): void {
                             $query->where('name', 'approve_operator');
                         })->exists(),
@@ -172,7 +172,7 @@ class OperatorsTable
                     ])
                     ->action(function (Operator $record, array $data): void {
                         $oldStatus = $record->status;
-                        $record->update(['status' => OperatorStatus::REJECTED]);
+                        $record->update(['status' => OperatorStatus::Rejected]);
 
                         // Get all users associated with this operator
                         $operatorUsers = $record->users;

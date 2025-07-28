@@ -24,7 +24,7 @@ class OperatorFactory extends Factory
         $type = fake()->randomElement(OperatorType::cases());
 
         return [
-            'name' => $type === OperatorType::HOTEL
+            'name' => $type === OperatorType::Hotel
                 ? fake()->company() . ' Hotel'
                 : fake()->company() . ' Bus Lines',
             'type' => $type,
@@ -54,7 +54,7 @@ class OperatorFactory extends Factory
     public function hotel(): static
     {
         return $this->state([
-            'type' => OperatorType::HOTEL,
+            'type' => OperatorType::Hotel,
             'name' => fake()->company() . ' Hotel',
         ]);
     }
@@ -65,7 +65,7 @@ class OperatorFactory extends Factory
     public function bus(): static
     {
         return $this->state([
-            'type' => OperatorType::BUS,
+            'type' => OperatorType::Bus,
             'name' => fake()->company() . ' Bus Lines',
         ]);
     }
@@ -76,7 +76,7 @@ class OperatorFactory extends Factory
     public function approved(): static
     {
         return $this->state([
-            'status' => OperatorStatus::APPROVED,
+            'status' => OperatorStatus::Approved,
         ]);
     }
 
@@ -86,7 +86,7 @@ class OperatorFactory extends Factory
     public function rejected(): static
     {
         return $this->state([
-            'status' => OperatorStatus::REJECTED,
+            'status' => OperatorStatus::Rejected,
         ]);
     }
 
@@ -96,7 +96,7 @@ class OperatorFactory extends Factory
     public function suspended(): static
     {
         return $this->state([
-            'status' => OperatorStatus::SUSPENDED,
+            'status' => OperatorStatus::Suspended,
         ]);
     }
 
@@ -106,7 +106,7 @@ class OperatorFactory extends Factory
     public function pending(): static
     {
         return $this->state([
-            'status' => OperatorStatus::PENDING,
+            'status' => OperatorStatus::Pending,
         ]);
     }
 }

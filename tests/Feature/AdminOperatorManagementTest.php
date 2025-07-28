@@ -32,7 +32,7 @@ describe('Admin Operator Management', function (): void {
 
     it('can list all operators in admin panel', function (): void {
         $operators = Operator::factory()->count(3)->create([
-            'status' => OperatorStatus::PENDING,
+            'status' => OperatorStatus::Pending,
         ]);
 
         livewire(ListOperators::class)
@@ -43,8 +43,8 @@ describe('Admin Operator Management', function (): void {
     it('can view operator details', function (): void {
         $operator = Operator::factory()->create([
             'name' => 'Sunshine Hotels',
-            'type' => OperatorType::HOTEL,
-            'status' => OperatorStatus::PENDING,
+            'type' => OperatorType::Hotel,
+            'status' => OperatorStatus::Pending,
             'contact_email' => 'info@sunshine.com',
             'contact_phone' => '+1-555-0123',
             'description' => 'Luxury hotel chain',
@@ -66,7 +66,7 @@ describe('Admin Operator Management', function (): void {
 
     it('can approve pending operator registration', function (): void {
         $operator = Operator::factory()->create([
-            'status' => OperatorStatus::PENDING,
+            'status' => OperatorStatus::Pending,
             'contact_email' => 'operator@example.com',
         ]);
 
@@ -74,24 +74,24 @@ describe('Admin Operator Management', function (): void {
             'record' => $operator->id,
         ])
             ->fillForm([
-                'status' => OperatorStatus::APPROVED->value,
+                'status' => OperatorStatus::Approved->value,
             ])
             ->call('save')
             ->assertNotified();
 
-        expect($operator->fresh()->status)->toBe(OperatorStatus::APPROVED);
+        expect($operator->fresh()->status)->toBe(OperatorStatus::Approved);
 
         Notification::assertSentTo(
             [$operator->contact_email],
             OperatorStatusUpdate::class,
             fn ($notification): bool => $notification->operator->id === $operator->id
-                && $notification->newStatus === OperatorStatus::APPROVED,
+                && $notification->newStatus === OperatorStatus::Approved,
         );
     });
 
     it('can reject operator registration', function (): void {
         $operator = Operator::factory()->create([
-            'status' => OperatorStatus::PENDING,
+            'status' => OperatorStatus::Pending,
             'contact_email' => 'operator@example.com',
         ]);
 
@@ -99,24 +99,24 @@ describe('Admin Operator Management', function (): void {
             'record' => $operator->id,
         ])
             ->fillForm([
-                'status' => OperatorStatus::REJECTED->value,
+                'status' => OperatorStatus::Rejected->value,
             ])
             ->call('save')
             ->assertNotified();
 
-        expect($operator->fresh()->status)->toBe(OperatorStatus::REJECTED);
+        expect($operator->fresh()->status)->toBe(OperatorStatus::Rejected);
 
         Notification::assertSentTo(
             [$operator->contact_email],
             OperatorStatusUpdate::class,
             fn ($notification): bool => $notification->operator->id === $operator->id
-                && $notification->newStatus === OperatorStatus::REJECTED,
+                && $notification->newStatus === OperatorStatus::Rejected,
         );
     });
 
     it('can suspend approved operator', function (): void {
         $operator = Operator::factory()->create([
-            'status' => OperatorStatus::APPROVED,
+            'status' => OperatorStatus::Approved,
             'contact_email' => 'operator@example.com',
         ]);
 
@@ -124,47 +124,47 @@ describe('Admin Operator Management', function (): void {
             'record' => $operator->id,
         ])
             ->fillForm([
-                'status' => OperatorStatus::SUSPENDED->value,
+                'status' => OperatorStatus::Suspended->value,
             ])
             ->call('save')
             ->assertNotified();
 
-        expect($operator->fresh()->status)->toBe(OperatorStatus::SUSPENDED);
+        expect($operator->fresh()->status)->toBe(OperatorStatus::Suspended);
 
         Notification::assertSentTo(
             [$operator->contact_email],
             OperatorStatusUpdate::class,
             fn ($notification): bool => $notification->operator->id === $operator->id
-                && $notification->newStatus === OperatorStatus::SUSPENDED,
+                && $notification->newStatus === OperatorStatus::Suspended,
         );
     });
 
     it('can filter operators by status', function (): void {
         $pendingOperators = Operator::factory()->count(2)->create([
-            'status' => OperatorStatus::PENDING,
+            'status' => OperatorStatus::Pending,
         ]);
 
         $approvedOperators = Operator::factory()->count(3)->create([
-            'status' => OperatorStatus::APPROVED,
+            'status' => OperatorStatus::Approved,
         ]);
 
         livewire(ListOperators::class)
-            ->filterTable('status', OperatorStatus::PENDING->value)
+            ->filterTable('status', OperatorStatus::Pending->value)
             ->assertCanSeeTableRecords($pendingOperators)
             ->assertCannotSeeTableRecords($approvedOperators);
     });
 
     it('can filter operators by type', function (): void {
         $hotelOperators = Operator::factory()->count(2)->create([
-            'type' => OperatorType::HOTEL,
+            'type' => OperatorType::Hotel,
         ]);
 
         $busOperators = Operator::factory()->count(3)->create([
-            'type' => OperatorType::BUS,
+            'type' => OperatorType::Bus,
         ]);
 
         livewire(ListOperators::class)
-            ->filterTable('type', OperatorType::HOTEL->value)
+            ->filterTable('type', OperatorType::Hotel->value)
             ->assertCanSeeTableRecords($hotelOperators)
             ->assertCannotSeeTableRecords($busOperators);
     });

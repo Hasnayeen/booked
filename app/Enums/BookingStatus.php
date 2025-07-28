@@ -2,30 +2,33 @@
 
 namespace App\Enums;
 
-enum BookingStatus: string
-{
-    case PENDING = 'pending';
-    case CONFIRMED = 'confirmed';
-    case CANCELLED = 'cancelled';
-    case COMPLETED = 'completed';
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
 
-    public function label(): string
+enum BookingStatus: string implements HasLabel, HasColor
+{
+    case Pending = 'pending';
+    case Confirmed = 'confirmed';
+    case Cancelled = 'cancelled';
+    case Completed = 'completed';
+
+    public function getLabel(): string
     {
         return match ($this) {
-            self::PENDING => 'Pending',
-            self::CONFIRMED => 'Confirmed',
-            self::CANCELLED => 'Cancelled',
-            self::COMPLETED => 'Completed',
+            self::Pending => 'Pending',
+            self::Confirmed => 'Confirmed',
+            self::Cancelled => 'Cancelled',
+            self::Completed => 'Completed',
         };
     }
 
-    public function color(): string
+    public function getColor(): string
     {
         return match ($this) {
-            self::PENDING => 'warning',
-            self::CONFIRMED => 'info',
-            self::CANCELLED => 'danger',
-            self::COMPLETED => 'success',
+            self::Pending => 'warning',
+            self::Confirmed => 'info',
+            self::Cancelled => 'danger',
+            self::Completed => 'success',
         };
     }
 }

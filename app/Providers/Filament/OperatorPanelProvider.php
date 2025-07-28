@@ -71,15 +71,15 @@ class OperatorPanelProvider extends PanelProvider
     {
         FilamentView::registerRenderHook(
             PanelsRenderHook::PAGE_START,
-            fn () => view('filament.operator.hooks.tenant-sidebar')
+            fn () => view('filament.operator.hooks.tenant-sidebar'),
         );
         FilamentView::registerRenderHook(
             PanelsRenderHook::SIDEBAR_NAV_START,
-            fn () => view('filament.operator.hooks.global-search')
+            fn () => view('filament.operator.hooks.global-search'),
         );
         FilamentView::registerRenderHook(
             PanelsRenderHook::PAGE_START,
-            fn () => view('filament.operator.hooks.user-menu')
+            fn () => view('filament.operator.hooks.user-menu'),
         );
     }
 }

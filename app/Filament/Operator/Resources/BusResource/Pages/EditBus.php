@@ -3,7 +3,8 @@
 namespace App\Filament\Operator\Resources\BusResource\Pages;
 
 use App\Filament\Operator\Resources\BusResource;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditBus extends EditRecord
@@ -13,8 +14,8 @@ class EditBus extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
+            ViewAction::make(),
+            DeleteAction::make(),
         ];
     }
 

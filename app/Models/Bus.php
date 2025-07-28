@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\BusCategory;
 use App\Enums\BusType;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -47,7 +49,8 @@ class Bus extends Model
     /**
      * Scope to filter active buses.
      */
-    public function scopeActive($query)
+    #[Scope]
+    protected function active($query)
     {
         return $query->where('is_active', true);
     }
@@ -55,7 +58,8 @@ class Bus extends Model
     /**
      * Scope to filter buses by category.
      */
-    public function scopeByCategory($query, BusCategory $category)
+    #[Scope]
+    protected function byCategory($query, BusCategory $category)
     {
         return $query->where('category', $category);
     }
@@ -63,7 +67,8 @@ class Bus extends Model
     /**
      * Scope to filter buses by bus type (AC/Non AC).
      */
-    public function scopeByBusType($query, BusType $busType)
+    #[Scope]
+    protected function byBusType($query, BusType $busType)
     {
         return $query->where('type', $busType);
     }
@@ -71,12 +76,14 @@ class Bus extends Model
     /**
      * Get the display name for the bus.
      */
-    public function getDisplayNameAttribute(): string
+    protected function displayName(): Attribute
     {
-        $category = $this->category?->getLabel() ?? 'Standard';
-        $busType = $this->type?->getLabel() ?? '';
+        return Attribute::make(get: function (): string {
+            $category = $this->category?->getLabel() ?? 'Standard';
+            $busType = $this->type?->getLabel() ?? '';
 
-        return trim("{$this->bus_number} ({$category} {$busType})");
+            return trim("{$this->bus_number} ({$category} {$busType})");
+        });
     }
 
     /**
@@ -90,10 +97,12 @@ class Bus extends Model
     /**
      * Get available seats (total seats minus booked seats).
      */
-    public function getAvailableSeatsAttribute(): int
+    protected function availableSeats(): Attribute
     {
-        $bookedSeats = $this->bookings()->where('status', 'confirmed')->sum('number_of_seats');
+        return Attribute::make(get: function (): int|float {
+            $bookedSeats = $this->bookings()->where('status', 'confirmed')->sum('number_of_seats');
 
-        return $this->total_seats - $bookedSeats;
+            return $this->total_seats - $bookedSeats;
+        });
     }
 }

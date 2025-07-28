@@ -4,18 +4,31 @@ namespace App\Filament\Operator\Resources;
 
 use App\Enums\BusCategory;
 use App\Enums\BusType;
-use App\Filament\Operator\Resources\BusResource\Pages;
+use App\Filament\Operator\Resources\BusResource\Pages\CreateBus;
+use App\Filament\Operator\Resources\BusResource\Pages\EditBus;
+use App\Filament\Operator\Resources\BusResource\Pages\ListBuses;
+use App\Filament\Operator\Resources\BusResource\Pages\ViewBus;
 use App\Models\Bus;
 use BackedEnum;
-use Filament\Actions;
-use Filament\Forms;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Schemas;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 class BusResource extends Resource
@@ -41,47 +54,47 @@ class BusResource extends Resource
         return $schema
             ->columns(5)
             ->schema([
-                Schemas\Components\Section::make('Bus Information')
+                Section::make('Bus Information')
                     ->schema([
-                        Forms\Components\TextInput::make('bus_number')
+                        TextInput::make('bus_number')
                             ->required()
                             ->maxLength(255)
                             ->unique(Bus::class, 'bus_number', ignoreRecord: true)
                             ->helperText('Enter a unique bus number for identification'),
 
-                        Forms\Components\Select::make('category')
+                        Select::make('category')
                             ->options(BusCategory::class)
                             ->required()
                             ->helperText('Select the service category for this bus'),
 
-                        Forms\Components\Select::make('type')
+                        Select::make('type')
                             ->options(BusType::class)
                             ->required()
                             ->helperText('Select if the bus has air conditioning'),
 
-                        Forms\Components\TextInput::make('total_seats')
+                        TextInput::make('total_seats')
                             ->required()
                             ->numeric()
                             ->minValue(1)
                             ->maxValue(100)
                             ->helperText('Enter the total number of seats (1-100)'),
 
-                        Forms\Components\TextInput::make('license_plate')
+                        TextInput::make('license_plate')
                             ->maxLength(255)
                             ->helperText('Vehicle registration/license plate number'),
 
-                        Forms\Components\Toggle::make('is_active')
+                        Toggle::make('is_active')
                             ->default(true)
                             ->helperText('Set whether this bus is currently active'),
                     ])
                     ->columns(2)
                     ->columnSpan(3),
 
-                Schemas\Components\Section::make('Amenities & Features')
+                Section::make('Amenities & Features')
                     ->schema([
-                        Forms\Components\Repeater::make('amenities')
+                        Repeater::make('amenities')
                             ->simple(
-                                Forms\Components\TextInput::make('amenity')
+                                TextInput::make('amenity')
                                     ->placeholder('e.g., WiFi, AC, USB Charging')
                                     ->maxLength(255),
                             )
@@ -91,9 +104,9 @@ class BusResource extends Resource
                     ])
                     ->columnSpan(2),
 
-                Schemas\Components\Section::make('Additional Information')
+                Section::make('Additional Information')
                     ->schema([
-                        Forms\Components\KeyValue::make('metadata')
+                        KeyValue::make('metadata')
                             ->helperText('Add any additional information as key-value pairs')
                             ->addActionLabel('Add Information'),
                     ])
@@ -107,59 +120,59 @@ class BusResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('bus_number')
+                TextColumn::make('bus_number')
                     ->searchable()
                     ->sortable()
                     ->copyable()
                     ->label('Bus Number'),
 
-                Tables\Columns\TextColumn::make('category')
+                TextColumn::make('category')
                     ->badge()
                     ->sortable()
                     ->label('Category'),
 
-                Tables\Columns\TextColumn::make('type')
+                TextColumn::make('type')
                     ->badge()
                     ->sortable()
                     ->label('Type'),
 
-                Tables\Columns\TextColumn::make('total_seats')
+                TextColumn::make('total_seats')
                     ->numeric()
                     ->sortable()
                     ->label('Seats'),
 
-                Tables\Columns\TextColumn::make('license_plate')
+                TextColumn::make('license_plate')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('License Plate'),
 
-                Tables\Columns\IconColumn::make('is_active')
+                IconColumn::make('is_active')
                     ->boolean()
                     ->label('Active'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('category')
+                SelectFilter::make('category')
                     ->options(BusCategory::class)
                     ->label('Category'),
 
-                Tables\Filters\SelectFilter::make('type')
+                SelectFilter::make('type')
                     ->options(BusType::class)
                     ->label('Type'),
 
-                Tables\Filters\TernaryFilter::make('is_active')
+                TernaryFilter::make('is_active')
                     ->label('Status')
                     ->placeholder('All buses')
                     ->trueLabel('Active buses')
                     ->falseLabel('Inactive buses'),
             ])
             ->recordActions([
-                Actions\ViewAction::make(),
-                Actions\EditAction::make(),
-                Actions\DeleteAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
@@ -175,10 +188,10 @@ class BusResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBuses::route('/'),
-            'create' => Pages\CreateBus::route('/create'),
-            'view' => Pages\ViewBus::route('/{record}'),
-            'edit' => Pages\EditBus::route('/{record}/edit'),
+            'index' => ListBuses::route('/'),
+            'create' => CreateBus::route('/create'),
+            'view' => ViewBus::route('/{record}'),
+            'edit' => EditBus::route('/{record}/edit'),
         ];
     }
 }

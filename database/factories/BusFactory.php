@@ -9,7 +9,7 @@ use App\Models\Operator;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Bus>
+ * @extends Factory<Bus>
  */
 class BusFactory extends Factory
 {
@@ -25,13 +25,13 @@ class BusFactory extends Factory
     {
         return [
             'operator_id' => Operator::factory(),
-            'bus_number' => $this->faker->unique()->bothify('BUS-###??'),
-            'category' => $this->faker->randomElement(BusCategory::cases()),
-            'type' => $this->faker->randomElement(BusType::cases()),
-            'total_seats' => $this->faker->numberBetween(20, 60),
-            'license_plate' => $this->faker->unique()->bothify('??-##-???'),
-            'is_active' => $this->faker->boolean(85), // 85% chance of being active
-            'amenities' => $this->faker->randomElements([
+            'bus_number' => fake()->unique()->bothify('BUS-###??'),
+            'category' => fake()->randomElement(BusCategory::cases()),
+            'type' => fake()->randomElement(BusType::cases()),
+            'total_seats' => fake()->numberBetween(20, 60),
+            'license_plate' => fake()->unique()->bothify('??-##-???'),
+            'is_active' => fake()->boolean(85), // 85% chance of being active
+            'amenities' => fake()->randomElements([
                 'WiFi',
                 'Air Conditioning',
                 'Comfortable Seats',
@@ -44,14 +44,14 @@ class BusFactory extends Factory
                 'Restroom',
                 'GPS Tracking',
                 'CCTV Security',
-            ], $this->faker->numberBetween(2, 6)),
+            ], fake()->numberBetween(2, 6)),
             'metadata' => [
-                'manufacturer' => $this->faker->randomElement(['Volvo', 'Mercedes', 'Scania', 'MAN', 'Isuzu']),
-                'model' => $this->faker->word(),
-                'year' => $this->faker->numberBetween(2015, 2024),
-                'fuel_type' => $this->faker->randomElement(['Diesel', 'CNG', 'Electric']),
-                'mileage' => $this->faker->numberBetween(50000, 500000),
-                'last_service_date' => $this->faker->dateTimeBetween('-6 months', 'now')->format('Y-m-d'),
+                'manufacturer' => fake()->randomElement(['Volvo', 'Mercedes', 'Scania', 'MAN', 'Isuzu']),
+                'model' => fake()->word(),
+                'year' => fake()->numberBetween(2015, 2024),
+                'fuel_type' => fake()->randomElement(['Diesel', 'CNG', 'Electric']),
+                'mileage' => fake()->numberBetween(50000, 500000),
+                'last_service_date' => fake()->dateTimeBetween('-6 months', 'now')->format('Y-m-d'),
             ],
         ];
     }
@@ -61,7 +61,7 @@ class BusFactory extends Factory
      */
     public function ac(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'type' => BusType::AC,
         ]);
     }
@@ -71,7 +71,7 @@ class BusFactory extends Factory
      */
     public function nonAc(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'type' => BusType::NON_AC,
         ]);
     }
@@ -81,9 +81,9 @@ class BusFactory extends Factory
      */
     public function luxury(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'category' => BusCategory::LUXURY,
-            'total_seats' => $this->faker->numberBetween(20, 40), // Luxury buses have fewer seats
+            'total_seats' => fake()->numberBetween(20, 40), // Luxury buses have fewer seats
             'amenities' => [
                 'WiFi',
                 'Air Conditioning',
@@ -106,9 +106,9 @@ class BusFactory extends Factory
      */
     public function sleeper(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'category' => BusCategory::SLEEPER,
-            'total_seats' => $this->faker->numberBetween(24, 36), // Sleeper buses have berths
+            'total_seats' => fake()->numberBetween(24, 36), // Sleeper buses have berths
             'amenities' => [
                 'Sleeping Berths',
                 'Air Conditioning',
@@ -129,9 +129,9 @@ class BusFactory extends Factory
      */
     public function standard(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'category' => BusCategory::STANDARD,
-            'total_seats' => $this->faker->numberBetween(40, 60), // Standard buses have more seats
+            'total_seats' => fake()->numberBetween(40, 60), // Standard buses have more seats
             'amenities' => [
                 'Comfortable Seats',
                 'Reading Lights',
@@ -146,7 +146,7 @@ class BusFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_active' => true,
         ]);
     }
@@ -156,7 +156,7 @@ class BusFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_active' => false,
         ]);
     }
@@ -166,7 +166,7 @@ class BusFactory extends Factory
      */
     public function forOperator(Operator $operator): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'operator_id' => $operator->id,
         ]);
     }

@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Bus;
 use App\Models\Operator;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 class BusPolicy
 {
@@ -17,7 +18,7 @@ class BusPolicy
             return true;
         }
 
-        if ($operator = filament()->getTenant()) {
+        if (($operator = filament()->getTenant()) instanceof Model) {
             return $user->belongsToOperator($operator);
         }
 
@@ -45,7 +46,7 @@ class BusPolicy
             return true;
         }
 
-        if ($operator = filament()->getTenant()) {
+        if (($operator = filament()->getTenant()) instanceof Model) {
             return $user->belongsToOperator($operator)
                 && $user->hasPermissionInOperator($operator, 'bus_manage');
         }

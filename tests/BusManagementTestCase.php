@@ -2,6 +2,4 @@
 
 namespace Tests;
 
-class BusManagementTestCase
-{
-}
+class BusManagementTestCase {}

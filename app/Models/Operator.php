@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\OperatorStatus;
 use App\Enums\OperatorType;
-use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;

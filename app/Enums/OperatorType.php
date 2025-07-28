@@ -6,7 +6,7 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 
-enum OperatorType: string implements HasLabel, HasIcon, HasColor
+enum OperatorType: string implements HasColor, HasIcon, HasLabel
 {
     case Hotel = 'hotel';
     case Bus = 'bus';

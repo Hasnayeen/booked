@@ -18,7 +18,7 @@ describe('OperatorStatusPage Infolist', function (): void {
 
     it('can render operator status infolist', function (): void {
         $operator = Operator::factory()->create([
-            'status' => OperatorStatus::APPROVED,
+            'status' => OperatorStatus::Approved,
             'name' => 'Test Operator',
             'contact_email' => 'test@example.com',
             'contact_phone' => '123-456-7890',
@@ -39,7 +39,7 @@ describe('OperatorStatusPage Infolist', function (): void {
 
     it('shows correct status for pending operator', function (): void {
         $operator = Operator::factory()->create([
-            'status' => OperatorStatus::PENDING,
+            'status' => OperatorStatus::Pending,
             'name' => 'Pending Operator',
         ]);
 
@@ -56,7 +56,7 @@ describe('OperatorStatusPage Infolist', function (): void {
 
     it('shows correct status for suspended operator', function (): void {
         $operator = Operator::factory()->create([
-            'status' => OperatorStatus::SUSPENDED,
+            'status' => OperatorStatus::Suspended,
             'name' => 'Suspended Operator',
         ]);
 
@@ -73,7 +73,7 @@ describe('OperatorStatusPage Infolist', function (): void {
 
     it('shows correct status for rejected operator', function (): void {
         $operator = Operator::factory()->create([
-            'status' => OperatorStatus::REJECTED,
+            'status' => OperatorStatus::Rejected,
             'name' => 'Rejected Operator',
         ]);
 
@@ -89,7 +89,7 @@ describe('OperatorStatusPage Infolist', function (): void {
     });
 
     it('can not access page when user does not belong to operator tenant', function (): void {
-        $otherOperator = Operator::factory()->create(['status' => OperatorStatus::APPROVED]);
+        $otherOperator = Operator::factory()->create(['status' => OperatorStatus::Approved]);
         filament()->setTenant($otherOperator);
 
         livewire(OperatorStatusPage::class, ['operator' => $otherOperator])

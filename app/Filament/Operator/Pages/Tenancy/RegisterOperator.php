@@ -52,8 +52,8 @@ class RegisterOperator extends RegisterTenant
                     ->label('Operator Type')
                     ->required()
                     ->options([
-                        OperatorType::HOTEL->value => 'Hotel Operator',
-                        OperatorType::BUS->value => 'Bus Operator',
+                        OperatorType::Hotel->value => 'Hotel Operator',
+                        OperatorType::Bus->value => 'Bus Operator',
                     ])
                     ->native(false)
                     ->placeholder('Select your business type')
@@ -95,7 +95,7 @@ class RegisterOperator extends RegisterTenant
         $operator = Operator::create([
             'name' => $data['name'],
             'type' => OperatorType::from($data['type']),
-            'status' => OperatorStatus::PENDING, // Always start as pending
+            'status' => OperatorStatus::Pending, // Always start as pending
             'contact_email' => $data['contact_email'],
             'contact_phone' => $data['contact_phone'] ?? null,
             'description' => $data['description'] ?? null,

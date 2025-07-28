@@ -9,30 +9,30 @@ use Filament\Support\Contracts\HasLabel;
 
 enum BusType: string implements HasColor, HasIcon, HasLabel
 {
-    case AC = 'ac';
-    case NON_AC = 'non_ac';
+    case Ac = 'ac';
+    case NonAc = 'non_ac';
 
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::AC => 'AC',
-            self::NON_AC => 'Non AC',
+            self::Ac => 'AC',
+            self::NonAc => 'Non AC',
         };
     }
 
     public function getIcon(): ?string
     {
         return match ($this) {
-            self::AC => LucideIcon::AirVent->value,
-            self::NON_AC => LucideIcon::Wind->value,
+            self::Ac => LucideIcon::AirVent->value,
+            self::NonAc => LucideIcon::Wind->value,
         };
     }
 
     public function getColor(): string|array|null
     {
         return match ($this) {
-            self::AC => 'info',
-            self::NON_AC => 'gray',
+            self::Ac => 'info',
+            self::NonAc => 'gray',
         };
     }
 }

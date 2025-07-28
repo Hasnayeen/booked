@@ -2,30 +2,33 @@
 
 namespace App\Enums;
 
-enum OperatorStatus: string
-{
-    case PENDING = 'pending';
-    case APPROVED = 'approved';
-    case SUSPENDED = 'suspended';
-    case REJECTED = 'rejected';
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
 
-    public function label(): string
+enum OperatorStatus: string implements HasLabel, HasColor
+{
+    case Pending = 'pending';
+    case Approved = 'approved';
+    case Suspended = 'suspended';
+    case Rejected = 'rejected';
+
+    public function getLabel(): string
     {
         return match ($this) {
-            self::PENDING => 'Pending',
-            self::APPROVED => 'Approved',
-            self::SUSPENDED => 'Suspended',
-            self::REJECTED => 'Rejected',
+            self::Pending => 'Pending',
+            self::Approved => 'Approved',
+            self::Suspended => 'Suspended',
+            self::Rejected => 'Rejected',
         };
     }
 
-    public function color(): string
+    public function getColor(): string
     {
         return match ($this) {
-            self::PENDING => 'warning',
-            self::APPROVED => 'success',
-            self::SUSPENDED => 'danger',
-            self::REJECTED => 'danger',
+            self::Pending => 'warning',
+            self::Approved => 'success',
+            self::Suspended => 'danger',
+            self::Rejected => 'danger',
         };
     }
 }

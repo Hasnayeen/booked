@@ -17,8 +17,8 @@ describe('Operator Management', function (): void {
 
         $operator = Operator::create([
             'name' => 'Sunshine Hotels',
-            'type' => OperatorType::HOTEL,
-            'status' => OperatorStatus::PENDING,
+            'type' => OperatorType::Hotel,
+            'status' => OperatorStatus::Pending,
             'contact_email' => 'contact@sunshinehotels.com',
             'contact_phone' => '+1-555-0123',
             'description' => 'Premium hotel chain',
@@ -26,14 +26,14 @@ describe('Operator Management', function (): void {
 
         expect($operator)->toBeInstanceOf(Operator::class);
         expect($operator->name)->toBe('Sunshine Hotels');
-        expect($operator->type)->toBe(OperatorType::HOTEL);
-        expect($operator->status)->toBe(OperatorStatus::PENDING);
+        expect($operator->type)->toBe(OperatorType::Hotel);
+        expect($operator->status)->toBe(OperatorStatus::Pending);
         expect($operator->contact_email)->toBe('contact@sunshinehotels.com');
 
         $this->assertDatabaseHas('operators', [
             'name' => 'Sunshine Hotels',
-            'type' => OperatorType::HOTEL->value,
-            'status' => OperatorStatus::PENDING->value,
+            'type' => OperatorType::Hotel->value,
+            'status' => OperatorStatus::Pending->value,
         ]);
     });
 
@@ -43,18 +43,18 @@ describe('Operator Management', function (): void {
         $admin->roles()->attach($adminRole);
 
         $operator = Operator::factory()->create([
-            'status' => OperatorStatus::PENDING,
+            'status' => OperatorStatus::Pending,
             'contact_email' => 'operator@example.com',
         ]);
 
         // Simulate admin approval
-        $operator->update(['status' => OperatorStatus::APPROVED]);
+        $operator->update(['status' => OperatorStatus::Approved]);
 
-        expect($operator->fresh()->status)->toBe(OperatorStatus::APPROVED);
+        expect($operator->fresh()->status)->toBe(OperatorStatus::Approved);
 
         $this->assertDatabaseHas('operators', [
             'id' => $operator->id,
-            'status' => OperatorStatus::APPROVED->value,
+            'status' => OperatorStatus::Approved->value,
         ]);
     });
 
@@ -64,18 +64,18 @@ describe('Operator Management', function (): void {
         $admin->roles()->attach($adminRole);
 
         $operator = Operator::factory()->create([
-            'status' => OperatorStatus::PENDING,
+            'status' => OperatorStatus::Pending,
             'contact_email' => 'operator@example.com',
         ]);
 
         // Simulate admin rejection
-        $operator->update(['status' => OperatorStatus::REJECTED]);
+        $operator->update(['status' => OperatorStatus::Rejected]);
 
-        expect($operator->fresh()->status)->toBe(OperatorStatus::REJECTED);
+        expect($operator->fresh()->status)->toBe(OperatorStatus::Rejected);
 
         $this->assertDatabaseHas('operators', [
             'id' => $operator->id,
-            'status' => OperatorStatus::REJECTED->value,
+            'status' => OperatorStatus::Rejected->value,
         ]);
     });
 
@@ -85,32 +85,32 @@ describe('Operator Management', function (): void {
         $admin->roles()->attach($adminRole);
 
         $operator = Operator::factory()->create([
-            'status' => OperatorStatus::APPROVED,
+            'status' => OperatorStatus::Approved,
             'contact_email' => 'operator@example.com',
         ]);
 
         // Simulate admin suspension
-        $operator->update(['status' => OperatorStatus::SUSPENDED]);
+        $operator->update(['status' => OperatorStatus::Suspended]);
 
-        expect($operator->fresh()->status)->toBe(OperatorStatus::SUSPENDED);
+        expect($operator->fresh()->status)->toBe(OperatorStatus::Suspended);
 
         $this->assertDatabaseHas('operators', [
             'id' => $operator->id,
-            'status' => OperatorStatus::SUSPENDED->value,
+            'status' => OperatorStatus::Suspended->value,
         ]);
     });
 
     it('can filter operators by status', function (): void {
         $pendingOperators = Operator::factory()->count(3)->create([
-            'status' => OperatorStatus::PENDING,
+            'status' => OperatorStatus::Pending,
         ]);
 
         $approvedOperators = Operator::factory()->count(2)->create([
-            'status' => OperatorStatus::APPROVED,
+            'status' => OperatorStatus::Approved,
         ]);
 
-        $pendingFromDb = Operator::where('status', OperatorStatus::PENDING)->get();
-        $approvedFromDb = Operator::where('status', OperatorStatus::APPROVED)->get();
+        $pendingFromDb = Operator::where('status', OperatorStatus::Pending)->get();
+        $approvedFromDb = Operator::where('status', OperatorStatus::Approved)->get();
 
         expect($pendingFromDb)->toHaveCount(3);
         expect($approvedFromDb)->toHaveCount(2);
@@ -123,15 +123,15 @@ describe('Operator Management', function (): void {
 
     it('can filter operators by type', function (): void {
         $hotelOperators = Operator::factory()->count(2)->create([
-            'type' => OperatorType::HOTEL,
+            'type' => OperatorType::Hotel,
         ]);
 
         $busOperators = Operator::factory()->count(3)->create([
-            'type' => OperatorType::BUS,
+            'type' => OperatorType::Bus,
         ]);
 
-        $hotelsFromDb = Operator::where('type', OperatorType::HOTEL)->get();
-        $busesFromDb = Operator::where('type', OperatorType::BUS)->get();
+        $hotelsFromDb = Operator::where('type', OperatorType::Hotel)->get();
+        $busesFromDb = Operator::where('type', OperatorType::Bus)->get();
 
         expect($hotelsFromDb)->toHaveCount(2);
         expect($busesFromDb)->toHaveCount(3);

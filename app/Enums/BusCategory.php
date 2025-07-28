@@ -9,17 +9,17 @@ use Filament\Support\Contracts\HasLabel;
 enum BusCategory: string implements HasColor, HasIcon, HasLabel
 {
     case Economy = 'economy';
-    case LUXURY = 'luxury';
-    case SLEEPER = 'sleeper';
-    case BUSINESS = 'business';
+    case Luxury = 'luxury';
+    case Sleeper = 'sleeper';
+    case Business = 'business';
 
     public function getLabel(): ?string
     {
         return match ($this) {
             self::Economy => 'Economy',
-            self::LUXURY => 'Luxury',
-            self::SLEEPER => 'Sleeper',
-            self::BUSINESS => 'Business',
+            self::Luxury => 'Luxury',
+            self::Sleeper => 'Sleeper',
+            self::Business => 'Business',
         };
     }
 
@@ -27,9 +27,9 @@ enum BusCategory: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::Economy => 'lucide-coins',
-            self::LUXURY => 'lucide-gem',
-            self::SLEEPER => 'lucide-bed',
-            self::BUSINESS => 'lucide-briefcase-business',
+            self::Luxury => 'lucide-gem',
+            self::Sleeper => 'lucide-bed',
+            self::Business => 'lucide-briefcase-business',
         };
     }
 
@@ -37,9 +37,9 @@ enum BusCategory: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::Economy => 'gray',
-            self::LUXURY => 'danger',
-            self::SLEEPER => 'info',
-            self::BUSINESS => 'success',
+            self::Luxury => 'danger',
+            self::Sleeper => 'info',
+            self::Business => 'success',
         };
     }
 }

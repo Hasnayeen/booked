@@ -122,20 +122,20 @@ class OperatorStatusPage extends Page implements HasSchemas
     public function getStatusHeading(): string
     {
         return match ($this->operator->status) {
-            OperatorStatus::PENDING => '⏳ Registration Under Review',
-            OperatorStatus::APPROVED => '✅ Operator Approved',
-            OperatorStatus::SUSPENDED => '⚠️ Account Suspended',
-            OperatorStatus::REJECTED => '❌ Registration Rejected',
+            OperatorStatus::Pending => '⏳ Registration Under Review',
+            OperatorStatus::Approved => '✅ Operator Approved',
+            OperatorStatus::Suspended => '⚠️ Account Suspended',
+            OperatorStatus::Rejected => '❌ Registration Rejected',
         };
     }
 
     public function getStatusDescription(): string
     {
         return match ($this->operator->status) {
-            OperatorStatus::PENDING => 'Your operator registration is currently being reviewed by our team. We will notify you via email once a decision has been made.',
-            OperatorStatus::APPROVED => 'Congratulations! Your operator account has been approved and is fully active. You now have access to all operator features.',
-            OperatorStatus::SUSPENDED => 'Your operator account has been temporarily suspended. Please contact support for assistance in resolving this issue.',
-            OperatorStatus::REJECTED => 'Unfortunately, your operator registration could not be approved at this time. Please review the feedback and consider reapplying.',
+            OperatorStatus::Pending => 'Your operator registration is currently being reviewed by our team. We will notify you via email once a decision has been made.',
+            OperatorStatus::Approved => 'Congratulations! Your operator account has been approved and is fully active. You now have access to all operator features.',
+            OperatorStatus::Suspended => 'Your operator account has been temporarily suspended. Please contact support for assistance in resolving this issue.',
+            OperatorStatus::Rejected => 'Unfortunately, your operator registration could not be approved at this time. Please review the feedback and consider reapplying.',
         };
     }
 
@@ -145,10 +145,10 @@ class OperatorStatusPage extends Page implements HasSchemas
     public function getStatusColor(): string
     {
         return match ($this->operator->status) {
-            OperatorStatus::PENDING => 'warning',
-            OperatorStatus::APPROVED => 'success',
-            OperatorStatus::SUSPENDED => 'danger',
-            OperatorStatus::REJECTED => 'danger',
+            OperatorStatus::Pending => 'warning',
+            OperatorStatus::Approved => 'success',
+            OperatorStatus::Suspended => 'danger',
+            OperatorStatus::Rejected => 'danger',
         };
     }
 
@@ -158,23 +158,23 @@ class OperatorStatusPage extends Page implements HasSchemas
     public function getNextSteps(): array
     {
         return match ($this->operator->status) {
-            OperatorStatus::PENDING => [
+            OperatorStatus::Pending => [
                 'Check your email regularly for updates',
                 'Ensure your contact information is up to date',
                 'Be patient - review process typically takes 2-3 business days',
             ],
-            OperatorStatus::APPROVED => [
+            OperatorStatus::Approved => [
                 'Complete your operator profile',
                 'Set up your booking settings',
                 'Start managing your reservations',
                 'Explore the operator dashboard features',
             ],
-            OperatorStatus::SUSPENDED => [
+            OperatorStatus::Suspended => [
                 'Contact support immediately',
                 'Review our terms of service',
                 'Prepare any required documentation',
             ],
-            OperatorStatus::REJECTED => [
+            OperatorStatus::Rejected => [
                 'Review the feedback provided',
                 'Address any issues mentioned',
                 'Consider submitting a new application',

@@ -87,12 +87,12 @@ describe('Operator Bus Management', function (): void {
         it('can filter buses by category through filament admin panel', function (): void {
             $luxuryBus = Bus::factory()->create([
                 'operator_id' => $this->operator->id,
-                'category' => BusCategory::LUXURY,
+                'category' => BusCategory::Luxury,
             ]);
 
             $standardBus = Bus::factory()->create([
                 'operator_id' => $this->operator->id,
-                'category' => BusCategory::STANDARD,
+                'category' => BusCategory::Economy,
             ]);
 
             livewire(ListBuses::class)
@@ -104,12 +104,12 @@ describe('Operator Bus Management', function (): void {
         it('can filter buses by type through filament admin panel', function (): void {
             $acBus = Bus::factory()->create([
                 'operator_id' => $this->operator->id,
-                'type' => BusType::AC,
+                'type' => BusType::Ac,
             ]);
 
             $nonAcBus = Bus::factory()->create([
                 'operator_id' => $this->operator->id,
-                'type' => BusType::NON_AC,
+                'type' => BusType::NonAc,
             ]);
 
             livewire(ListBuses::class)
@@ -143,8 +143,8 @@ describe('Operator Bus Management', function (): void {
 
             $busData = [
                 'bus_number' => 'ABC-123',
-                'category' => BusCategory::LUXURY->value,
-                'type' => BusType::AC->value,
+                'category' => BusCategory::Luxury->value,
+                'type' => BusType::Ac->value,
                 'total_seats' => 45,
                 'license_plate' => 'LIC-123',
                 'is_active' => true,
@@ -161,8 +161,8 @@ describe('Operator Bus Management', function (): void {
             $createdBus = Bus::where('bus_number', 'ABC-123')->first();
             expect($createdBus)->not->toBeNull();
             expect($createdBus->operator_id)->toBe($this->operator->id);
-            expect($createdBus->category)->toBe(BusCategory::LUXURY);
-            expect($createdBus->type)->toBe(BusType::AC);
+            expect($createdBus->category)->toBe(BusCategory::Luxury);
+            expect($createdBus->type)->toBe(BusType::Ac);
             expect($createdBus->total_seats)->toBe(45);
             expect($createdBus->license_plate)->toBe('LIC-123');
             expect($createdBus->is_active)->toBeTrue();
@@ -194,8 +194,8 @@ describe('Operator Bus Management', function (): void {
             livewire(CreateBus::class)
                 ->fillForm([
                     'bus_number' => 'UNIQUE-123',
-                    'category' => BusCategory::STANDARD->value,
-                    'type' => BusType::AC->value,
+                    'category' => BusCategory::Economy->value,
+                    'type' => BusType::Ac->value,
                     'total_seats' => 40,
                 ])
                 ->call('create')

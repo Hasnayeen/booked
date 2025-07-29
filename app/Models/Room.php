@@ -4,16 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Room extends Model
 {
+    use SoftDeletes;
+
     /**
      * The attributes that are mass assignable.
      */
     protected $fillable = [
         'operator_id',
         'room_number',
-        'room_type',
+        'type',
         'price_per_night',
         'capacity',
         'description',
@@ -28,7 +31,7 @@ class Room extends Model
     protected function casts(): array
     {
         return [
-            'price_per_night' => 'decimal:2',
+            'price_per_night' => 'integer',
             'capacity' => 'integer',
             'is_available' => 'boolean',
             'amenities' => 'array',

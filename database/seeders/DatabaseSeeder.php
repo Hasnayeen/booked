@@ -50,6 +50,10 @@ class DatabaseSeeder extends Seeder
         $operator = Operator::factory()->create();
         $operatorUser->operators()->attach($operator->id, ['role_id' => $operatorRole->id]);
 
+        $this->call([
+            BusSeeder::class,
+        ]);
+
         $this->command->info('Database seeded successfully!');
         $this->command->info('Admin user: admin@example.com');
         $this->command->info('Regular user: user@example.com');

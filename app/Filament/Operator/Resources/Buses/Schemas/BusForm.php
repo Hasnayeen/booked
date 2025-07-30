@@ -48,13 +48,6 @@ class BusForm
                                     ->required()
                                     ->helperText('Select if the bus has air conditioning'),
 
-                                TextInput::make('total_seats')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(1)
-                                    ->maxValue(100)
-                                    ->helperText('Enter the total number of seats (1-100)'),
-
                                 TextInput::make('license_plate')
                                     ->maxLength(255)
                                     ->helperText('Vehicle registration/license plate number'),
@@ -110,7 +103,16 @@ class BusForm
                                     ])
                                     ->default('1')
                                     ->required()
-                                    ->helperText('Select the deck type of the bus'),
+                                    ->helperText('Select the deck type of the bus')
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        self::calculateTotalSeats($set, $get);
+                                    }),
+
+                                TextInput::make('total_seats')
+                                    ->readOnly()
+                                    ->integer()
+                                    ->default(20)
+                                    ->helperText('Automatically calculated from seat configuration'),
 
                                 self::getLowerDeckSeatConfig(),
 
@@ -124,14 +126,14 @@ class BusForm
                                 Tab::make('Lower Deck')
                                     ->schema([
                                         View::make('filament.schemas.components.bus_seat_layout')
-                                            ->columnSpan(2)
+                                            ->columnSpan(2),
                                     ]),
 
                                 Tab::make('Upper Deck')
                                     ->disabled(fn (Get $get) => $get('deck') !== '2')
                                     ->schema([
                                     ]),
-                            ])
+                            ]),
                     ])
                     ->columnSpanFull(),
             ]);
@@ -162,7 +164,18 @@ class BusForm
                     ->minValue(2)
                     ->maxValue(4)
                     ->default(4)
-                    ->helperText('Number of seat per row (2-4)'),
+                    ->helperText('Number of seat per row (2-4)')
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        // Reset column layout to a valid option when columns change
+                        $validLayouts = match ((int) $state) {
+                            2 => '1:1',
+                            3 => '2:1',
+                            4 => '2:2',
+                            default => '2:2',
+                        };
+                        $set('column_layout', $validLayouts);
+                        self::calculateTotalSeats($set, $get);
+                    }),
 
                 ToggleButtons::make('column_label')
                     ->live()
@@ -176,10 +189,11 @@ class BusForm
                     ->helperText('Select how the columns are labeled'),
 
                 Select::make('column_layout')
-                    ->options(fn (Get $get) => match((int) $get('total_columns')) {
+                    ->options(fn (Get $get) => match ((int) $get('total_columns')) {
                         2 => ['1:1' => '1:1 (Left: 1, Right: 1)'],
                         3 => ['2:1' => '2:1 (Left: 2, Right: 1)', '1:2' => '1:2 (Left: 1, Right: 2)'],
                         4 => ['2:2' => '2:2 (Left: 2, Right: 2)'],
+                        default => ['2:2' => '2:2 (Left: 2, Right: 2)'],
                     })
                     ->default('2:2')
                     ->helperText('Define the number of columns for left and right seating'),
@@ -192,7 +206,10 @@ class BusForm
                     ->minValue(5)
                     ->maxValue(10)
                     ->default(5)
-                    ->helperText('Number of rows (5-10)'),
+                    ->helperText('Number of rows (5-10)')
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        self::calculateTotalSeats($set, $get);
+                    }),
 
                 ToggleButtons::make('row_label')
                     ->live()
@@ -204,7 +221,7 @@ class BusForm
                     ->grouped()
                     ->required()
                     ->helperText('Select how the rows are labeled'),
-                
+
                 TextInput::make('price_per_seat')
                     ->columnStart(1)
                     ->required()
@@ -243,7 +260,18 @@ class BusForm
                     ->minValue(2)
                     ->maxValue(4)
                     ->default(4)
-                    ->helperText('Number of seat per row (2-4)'),
+                    ->helperText('Number of seat per row (2-4)')
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        // Reset column layout to a valid option when columns change
+                        $validLayouts = match ((int) $state) {
+                            2 => '1:1',
+                            3 => '2:1',
+                            4 => '2:2',
+                            default => '2:2',
+                        };
+                        $set('column_layout_upper', $validLayouts);
+                        self::calculateTotalSeats($set, $get);
+                    }),
 
                 ToggleButtons::make('column_label_upper')
                     ->label('Column Label')
@@ -259,10 +287,11 @@ class BusForm
 
                 Select::make('column_layout_upper')
                     ->label('Column Layout')
-                    ->options(fn (Get $get) => match((int) $get('total_columns')) {
+                    ->options(fn (Get $get) => match ((int) $get('total_columns_upper')) {
                         2 => ['1:1' => '1:1 (Left: 1, Right: 1)'],
                         3 => ['2:1' => '2:1 (Left: 2, Right: 1)', '1:2' => '1:2 (Left: 1, Right: 2)'],
                         4 => ['2:2' => '2:2 (Left: 2, Right: 2)'],
+                        default => ['2:2' => '2:2 (Left: 2, Right: 2)'],
                     })
                     ->default('2:2')
                     ->helperText('Define the number of columns for left and right seating'),
@@ -276,7 +305,10 @@ class BusForm
                     ->minValue(5)
                     ->maxValue(10)
                     ->default(5)
-                    ->helperText('Number of rows (5-10)'),
+                    ->helperText('Number of rows (5-10)')
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        self::calculateTotalSeats($set, $get);
+                    }),
 
                 ToggleButtons::make('row_label_upper')
                     ->label('Row Label')
@@ -299,5 +331,24 @@ class BusForm
                     ->default(0)
                     ->helperText('Price per seat in this configuration'),
             ]);
+    }
+
+    protected static function calculateTotalSeats(callable $set, callable $get): void
+    {
+        $deck = $get('deck');
+        $lowerColumns = (int) ($get('total_columns') ?? 4);
+        $lowerRows = (int) ($get('total_rows') ?? 5);
+        $lowerSeats = $lowerColumns * $lowerRows;
+
+        if ($deck === '2') {
+            $upperColumns = (int) ($get('total_columns_upper') ?? 4);
+            $upperRows = (int) ($get('total_rows_upper') ?? 5);
+            $upperSeats = $upperColumns * $upperRows;
+            $totalSeats = $lowerSeats + $upperSeats;
+        } else {
+            $totalSeats = $lowerSeats;
+        }
+
+        $set('total_seats', $totalSeats);
     }
 }

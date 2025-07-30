@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Operator\Resources\BusResource\Pages;
+namespace App\Filament\Operator\Resources\Buses\Pages;
 
-use App\Filament\Operator\Resources\BusResource;
+use App\Filament\Operator\Resources\Buses\BusResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 

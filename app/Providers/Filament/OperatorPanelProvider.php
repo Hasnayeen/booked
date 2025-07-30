@@ -39,7 +39,7 @@ class OperatorPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Cyan,
             ])
-            ->viteTheme('resources/css/filament/operator/theme.css')
+            ->viteTheme('resources/css/theme.css')
             ->sidebarWidth('18rem')
             ->discoverResources(in: app_path('Filament/Operator/Resources'), for: 'App\Filament\Operator\Resources')
             ->discoverPages(in: app_path('Filament/Operator/Pages'), for: 'App\Filament\Operator\Pages')

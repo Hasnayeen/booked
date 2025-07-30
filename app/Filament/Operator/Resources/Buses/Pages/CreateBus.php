@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Operator\Resources\BusResource\Pages;
+namespace App\Filament\Operator\Resources\Buses\Pages;
 
-use App\Filament\Operator\Resources\BusResource;
+use App\Filament\Operator\Resources\Buses\BusResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,9 +12,8 @@ class CreateBus extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // Automatically set the operator_id to the current user's operator
         $data['operator_id'] = Auth::user()->operators()->first()?->id;
-        // dd($data);
+        dd($data);
 
         return $data;
     }

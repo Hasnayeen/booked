@@ -1,9 +1,8 @@
-@import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import '../../vendor/filament/filament/resources/css/theme.css';
 
-@source '../../../../app/Filament/**/*';
-@source '../../../../resources/views/filament/**/*';
-@source '../../../../resources/views/filament/hooks/**/*';
-
+@source '../../app/Filament/**/*';
+@source '../../resources/views/filament/**/*';
+@source '../../resources/views/filament/hooks/**/*';
 
 body.fi-body:has(.fi-layout) {
     @apply bg-slate-100 dark:bg-gray-900;
@@ -14,11 +13,11 @@ body.fi-body:has(.fi-layout) {
 }
 
 .fi-layout {
-    @apply h-[100dvh];
+    @apply h-[100dvh] fixed;
 }
 
 .fi-sidebar {
-    @apply ml-[calc(var(--spacing)*16)] h-[calc(100%-1rem)] mb-2;
+    @apply ml-[calc(var(--spacing)*16)] h-[calc(100%-1rem)] my-2;
 }
 
 .fi-sidebar-nav {
@@ -26,11 +25,7 @@ body.fi-body:has(.fi-layout) {
 }
 
 .fi-main-ctn {
-    @apply mx-3 my-2 bg-white dark:bg-gray-800 rounded-xl ring ring-slate-300 dark:ring-slate-950;
-}
-
-.fi-main {
-    @apply overflow-y-auto;
+    @apply mx-3 my-2 bg-white dark:bg-gray-800 rounded-xl ring ring-slate-300 dark:ring-slate-950 overflow-y-auto;
 }
 
 .fi-breadcrumbs {

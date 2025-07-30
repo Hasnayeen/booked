@@ -59,11 +59,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('operator_id')->constrained()->onDelete('cascade');
             $table->string('bus_number');
-            $table->string('category'); // standard, luxury, sleeper, custom
-            $table->string('type'); // ac, non_ac
+            $table->string('category');
+            $table->string('type');
             $table->integer('total_seats');
             $table->string('license_plate')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->json('seat_config')->nullable()->comment('Configuration of seats (e.g., layout, seat numbers)');
             $table->json('amenities')->nullable();
             $table->json('metadata')->nullable();
             $table->timestamps();

@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Filament\Operator\Resources\BusResource\Pages;
+namespace App\Filament\Operator\Resources\Buses\Pages;
 
-use App\Filament\Operator\Resources\BusResource;
+use App\Filament\Operator\Resources\Buses\BusResource;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -16,6 +18,8 @@ class EditBus extends EditRecord
         return [
             ViewAction::make(),
             DeleteAction::make(),
+            ForceDeleteAction::make(),
+            RestoreAction::make(),
         ];
     }
 

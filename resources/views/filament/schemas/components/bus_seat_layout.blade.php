@@ -1,9 +1,23 @@
 @php
-    $columns = $get('total_columns') ?: 4;
-    $rows = $get('total_rows') ?: 5;
-    $columnLabel = $get('column_label') ?: 'alpha';
-    $rowLabel = $get('row_label') ?: 'numeric';
-    $columnLayout = $get('column_layout') ?: '2:2';
+    $deck = $deck ?? 'lower'; // Default to lower deck
+    $isUpperDeck = $deck === 'upper';
+    
+    // Get configuration values based on deck
+    $columns = $isUpperDeck 
+        ? ($get('total_columns_upper') ?: 4)
+        : ($get('total_columns') ?: 4);
+    $rows = $isUpperDeck 
+        ? ($get('total_rows_upper') ?: 5)
+        : ($get('total_rows') ?: 5);
+    $columnLabel = $isUpperDeck 
+        ? ($get('column_label_upper') ?: 'alpha')
+        : ($get('column_label') ?: 'alpha');
+    $rowLabel = $isUpperDeck 
+        ? ($get('row_label_upper') ?: 'numeric')
+        : ($get('row_label') ?: 'numeric');
+    $columnLayout = $isUpperDeck 
+        ? ($get('column_layout_upper') ?: '2:2')
+        : ($get('column_layout') ?: '2:2');
 
     // Generate labels
     $columnLabels = $columnLabel === 'numeric'

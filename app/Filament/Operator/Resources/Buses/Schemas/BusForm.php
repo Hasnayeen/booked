@@ -122,6 +122,7 @@ class BusForm
                         Tabs::make('seat_layout')
                             ->label('Seat Layout')
                             ->columnSpan(2)
+                            ->extraAttributes(['class' => 'sticky top-8'])
                             ->tabs([
                                 Tab::make('Lower Deck')
                                     ->schema([
@@ -130,8 +131,13 @@ class BusForm
                                     ]),
 
                                 Tab::make('Upper Deck')
-                                    ->disabled(fn (Get $get) => $get('deck') !== '2')
+                                    ->visible(fn (Get $get) => $get('deck') === '2')
                                     ->schema([
+                                        View::make('filament.schemas.components.bus_seat_layout')
+                                            ->viewData([
+                                                'deck' => 'upper',
+                                            ])
+                                            ->columnSpan(2),
                                     ]),
                             ]),
                     ])
@@ -157,7 +163,7 @@ class BusForm
                     ->helperText('Select the type of seating available in this bus'),
 
                 TextInput::make('total_columns')
-                    ->live()
+                    ->live(debounce: 500)
                     ->columnStart(1)
                     ->required()
                     ->integer()
@@ -189,6 +195,7 @@ class BusForm
                     ->helperText('Select how the columns are labeled'),
 
                 Select::make('column_layout')
+                    ->live()
                     ->options(fn (Get $get) => match ((int) $get('total_columns')) {
                         2 => ['1:1' => '1:1 (Left: 1, Right: 1)'],
                         3 => ['2:1' => '2:1 (Left: 2, Right: 1)', '1:2' => '1:2 (Left: 1, Right: 2)'],
@@ -199,7 +206,7 @@ class BusForm
                     ->helperText('Define the number of columns for left and right seating'),
 
                 TextInput::make('total_rows')
-                    ->live()
+                    ->live(debounce: 500)
                     ->columnStart(1)
                     ->required()
                     ->integer()
@@ -253,7 +260,7 @@ class BusForm
 
                 TextInput::make('total_columns_upper')
                     ->label('Total Columns')
-                    ->live()
+                    ->live(debounce: 500)
                     ->columnStart(1)
                     ->required()
                     ->integer()
@@ -287,6 +294,7 @@ class BusForm
 
                 Select::make('column_layout_upper')
                     ->label('Column Layout')
+                    ->live()
                     ->options(fn (Get $get) => match ((int) $get('total_columns_upper')) {
                         2 => ['1:1' => '1:1 (Left: 1, Right: 1)'],
                         3 => ['2:1' => '2:1 (Left: 2, Right: 1)', '1:2' => '1:2 (Left: 1, Right: 2)'],
@@ -299,7 +307,7 @@ class BusForm
                 TextInput::make('total_rows_upper')
                     ->label('Total Rows')
                     ->columnStart(1)
-                    ->live()
+                    ->live(debounce: 500)
                     ->required()
                     ->integer()
                     ->minValue(5)

@@ -1,8 +1,7 @@
 @import '../../vendor/filament/filament/resources/css/theme.css';
 
-@source '../../app/Filament/**/*';
+@source '../../app/**/*';
 @source '../../resources/views/filament/**/*';
-@source '../../resources/views/filament/hooks/**/*';
 
 body.fi-body:has(.fi-layout) {
     @apply bg-slate-100 dark:bg-gray-900;

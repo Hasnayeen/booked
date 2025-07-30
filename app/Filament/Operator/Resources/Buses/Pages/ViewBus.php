@@ -3,6 +3,7 @@
 namespace App\Filament\Operator\Resources\Buses\Pages;
 
 use App\Filament\Operator\Resources\Buses\BusResource;
+use App\ValueObjects\SeatConfiguration;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;

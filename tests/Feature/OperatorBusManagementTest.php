@@ -2,11 +2,11 @@
 
 use App\Enums\BusCategory;
 use App\Enums\BusType;
-use App\Filament\Operator\Resources\BusResource;
-use App\Filament\Operator\Resources\BusResource\Pages\CreateBus;
-use App\Filament\Operator\Resources\BusResource\Pages\EditBus;
-use App\Filament\Operator\Resources\BusResource\Pages\ListBuses;
-use App\Filament\Operator\Resources\BusResource\Pages\ViewBus;
+use App\Filament\Operator\Resources\Buses\BusResource;
+use App\Filament\Operator\Resources\Buses\Pages\CreateBus;
+use App\Filament\Operator\Resources\Buses\Pages\EditBus;
+use App\Filament\Operator\Resources\Buses\Pages\ListBuses;
+use App\Filament\Operator\Resources\Buses\Pages\ViewBus;
 use App\Models\Bus;
 use App\Models\Operator;
 use App\Models\Role;
@@ -52,8 +52,8 @@ describe('Operator Bus Management', function (): void {
         it('has correct navigation settings', function (): void {
             expect(BusResource::getNavigationGroup())->toBe('Fleet Management');
             expect(BusResource::getNavigationLabel())->toBe('Buses');
-            expect(BusResource::getModelLabel())->toBe('Bus');
-            expect(BusResource::getPluralModelLabel())->toBe('Buses');
+            expect(BusResource::getModelLabel())->toBe('bus');
+            expect(BusResource::getPluralModelLabel())->toBe('buses');
         });
 
         it('can create resource pages', function (): void {
@@ -163,7 +163,7 @@ describe('Operator Bus Management', function (): void {
             expect($createdBus->operator_id)->toBe($this->operator->id);
             expect($createdBus->category)->toBe(BusCategory::Luxury);
             expect($createdBus->type)->toBe(BusType::Ac);
-            expect($createdBus->total_seats)->toBe(45);
+            expect($createdBus->total_seats)->toBe(20); // Calculated from default seat configuration (4 columns × 5 rows = 20)
             expect($createdBus->license_plate)->toBe('LIC-123');
             expect($createdBus->is_active)->toBeTrue();
         });
@@ -174,12 +174,14 @@ describe('Operator Bus Management', function (): void {
             livewire(CreateBus::class)
                 ->fillForm([
                     'bus_number' => '',
-                    'total_seats' => null,
+                    'category' => '',
+                    'type' => '',
                 ])
                 ->call('create')
                 ->assertHasFormErrors([
                     'bus_number' => 'required',
-                    'total_seats' => 'required',
+                    'category' => 'required',
+                    'type' => 'required',
                 ]);
         });
 
@@ -213,14 +215,14 @@ describe('Operator Bus Management', function (): void {
 
     describe('Bus Viewing', function (): void {
         it('can view bus details through filament admin panel', function (): void {
+            $this->actingAs($this->staffUser);
+
             livewire(ViewBus::class, ['record' => $this->bus->getRouteKey()])
-                ->assertSuccessful()
-                ->assertFormSet([
-                    'bus_number' => $this->bus->bus_number,
-                    'category' => $this->bus->category->value,
-                    'type' => $this->bus->type->value,
-                    'total_seats' => $this->bus->total_seats,
-                ]);
+                ->assertSee($this->bus->bus_number)
+                ->assertSee(ucwords($this->bus->category->value))
+                ->assertSee($this->bus->type->getLabel())
+                ->assertSee($this->bus->total_seats)
+                ->assertSuccessful();
         });
 
         it('cannot view other operators buses through filament admin panel', function (): void {
@@ -234,7 +236,9 @@ describe('Operator Bus Management', function (): void {
     describe('Bus Editing', function (): void {
         it('can edit bus through filament admin panel', function (): void {
             $updatedData = [
-                'total_seats' => 50,
+                'total_columns' => 4,
+                'total_rows' => 10,
+                'price_per_seat' => 1500,
                 'is_active' => false,
             ];
 
@@ -245,7 +249,7 @@ describe('Operator Bus Management', function (): void {
                 ->assertNotified();
 
             $this->bus->refresh();
-            expect($this->bus->total_seats)->toBe(50);
+            expect($this->bus->total_seats)->toBe(40);
             expect($this->bus->is_active)->toBeFalse();
         });
 

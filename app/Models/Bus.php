@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\SeatConfigurationCast;
 use App\Enums\BusCategory;
 use App\Enums\BusType;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -28,6 +29,7 @@ class Bus extends Model
             'is_active' => 'boolean',
             'amenities' => 'array',
             'metadata' => 'array',
+            'seat_config' => SeatConfigurationCast::class,
         ];
     }
 

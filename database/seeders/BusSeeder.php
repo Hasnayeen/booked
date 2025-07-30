@@ -41,12 +41,19 @@ class BusSeeder extends Seeder
                     $licensePrefix = $this->getLicensePlatePrefix($category, $type);
                     $licensePlate = sprintf('%s-%04d', $licensePrefix, $busCounter);
 
-                    Bus::create([
-                        'operator_id' => $operator->id,
+                    // Use factory with appropriate state for category
+                    $factory = Bus::factory()->forOperator($operator);
+                    
+                    $factory = match ($category) {
+                        BusCategory::Luxury => $factory->luxury(),
+                        BusCategory::Sleeper => $factory->sleeper(),
+                        BusCategory::Economy, BusCategory::Business => $factory->standard(),
+                    };
+
+                    $factory->create([
                         'bus_number' => $busNumber,
                         'category' => $category,
                         'type' => $type,
-                        'total_seats' => $this->getSeatsForCategory($category),
                         'license_plate' => $licensePlate,
                         'is_active' => true,
                         'amenities' => $this->getAmenitiesForCategoryAndType($category, $type),
@@ -64,19 +71,6 @@ class BusSeeder extends Seeder
         }
 
         $this->command->info('Created ' . ($busCounter - 1) . ' buses for operator: ' . $operator->name);
-    }
-
-    /**
-     * Get the number of seats based on bus category.
-     */
-    private function getSeatsForCategory(BusCategory $category): int
-    {
-        return match ($category) {
-            BusCategory::Economy => fake()->numberBetween(45, 55),
-            BusCategory::Business => fake()->numberBetween(35, 45),
-            BusCategory::Luxury => fake()->numberBetween(28, 38),
-            BusCategory::Sleeper => fake()->numberBetween(32, 40),
-        };
     }
 
     /**

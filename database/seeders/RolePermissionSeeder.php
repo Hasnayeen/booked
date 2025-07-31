@@ -19,7 +19,8 @@ class RolePermissionSeeder extends Seeder
             'manage_users' => 'Can manage system users',
             'view_reports' => 'Can view system reports',
             'manage_settings' => 'Can manage system settings',
-            'bus_manage' => 'Can manage buses for an operator',
+            'manage_buses' => 'Can manage buses for an operator',
+            'manage_routes' => 'Can manage routes for an operator',
         ];
 
         foreach ($permissions as $name => $description) {
@@ -55,7 +56,8 @@ class RolePermissionSeeder extends Seeder
         ]);
 
         $operatorAdminRole->permissions()->sync([
-            Permission::where('name', 'bus_manage')->first()->id,
+            Permission::where('name', 'manage_buses')->first()->id,
+            Permission::where('name', 'manage_routes')->first()->id,
         ]);
 
         $operatorStaffRole = Role::firstOrCreate([
@@ -64,7 +66,8 @@ class RolePermissionSeeder extends Seeder
             'is_default' => true,
         ]);
         $operatorStaffRole->permissions()->sync([
-            Permission::where('name', 'bus_manage')->first()->id,
+            Permission::where('name', 'manage_buses')->first()->id,
+            Permission::where('name', 'manage_routes')->first()->id,
         ]);
 
         $this->command->info('Roles and permissions seeded successfully!');

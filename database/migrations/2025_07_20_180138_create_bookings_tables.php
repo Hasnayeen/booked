@@ -88,8 +88,6 @@ return new class extends Migration
             $table->time('departure_time'); // Start time for the journey
             $table->time('arrival_time'); // End time for the journey
             $table->decimal('distance_km', 8, 2)->nullable();
-            $table->time('estimated_duration')->nullable();
-            $table->unsignedBigInteger('base_price')->default(0);
             $table->json('off_days')->nullable(); // Days when route is not operational (e.g., ['sunday', 'monday'])
             $table->boolean('is_active')->default(true);
             $table->json('stops')->nullable(); // Intermediate stops

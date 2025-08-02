@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Operator\Pages\Tenancy\EditOperatorProfile;
 use App\Filament\Operator\Pages\Tenancy\RegisterOperator;
+use App\Http\Middleware\PanelCommonConfig;
 use App\Models\Operator;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -35,12 +36,9 @@ class OperatorPanelProvider extends PanelProvider
             ->tenant(Operator::class)
             ->tenantRegistration(RegisterOperator::class)
             ->tenantProfile(EditOperatorProfile::class)
-            ->brandLogo(asset('logo.svg'))
             ->colors([
                 'primary' => Color::Cyan,
             ])
-            ->viteTheme('resources/css/theme.css')
-            ->sidebarWidth('18rem')
             ->discoverResources(in: app_path('Filament/Operator/Resources'), for: 'App\Filament\Operator\Resources')
             ->discoverPages(in: app_path('Filament/Operator/Pages'), for: 'App\Filament\Operator\Pages')
             ->pages([
@@ -59,27 +57,12 @@ class OperatorPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                PanelCommonConfig::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
             ])
             ->strictAuthorization()
             ->databaseNotifications();
-    }
-
-    public function boot(): void
-    {
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::PAGE_START,
-            fn () => view('filament.operator.hooks.tenant-sidebar'),
-        );
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::SIDEBAR_NAV_START,
-            fn () => view('filament.operator.hooks.global-search'),
-        );
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::PAGE_START,
-            fn () => view('filament.operator.hooks.user-menu'),
-        );
     }
 }

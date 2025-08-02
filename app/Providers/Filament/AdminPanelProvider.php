@@ -25,10 +25,13 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandLogo(asset('logo.svg'))
             ->colors([
                 'primary' => Color::Cyan,
             ])
             ->viteTheme('resources/css/theme.css')
+            ->sidebarWidth('18rem')
+            ->topbar(false)
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\Filament\Admin\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\Filament\Admin\Pages')
             ->pages([

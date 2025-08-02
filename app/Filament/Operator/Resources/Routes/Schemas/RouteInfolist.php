@@ -25,8 +25,7 @@ class RouteInfolist
                     ->time(),
                 TextEntry::make('distance_km')
                     ->numeric(),
-                TextEntry::make('estimated_duration')
-                    ->time(),
+                TextEntry::make('estimated_duration'),
                 TextEntry::make('base_price')
                     ->numeric(),
                 IconEntry::make('is_active')

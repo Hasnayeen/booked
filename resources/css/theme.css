@@ -7,7 +7,7 @@ body.fi-body:has(.fi-layout) {
     @apply bg-slate-100 dark:bg-gray-900;
 }
 
-.fi-topbar-ctn, .fi-sidebar-nav-tenant-menu-ctn {
+.fi-sidebar-nav-tenant-menu-ctn {
     @apply hidden;
 }
 

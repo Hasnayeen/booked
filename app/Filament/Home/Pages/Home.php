@@ -1,21 +1,24 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Filament\Home\Pages;
 
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Section;
+use Filament\Pages\Page;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Schemas\Concerns\InteractsWithSchemas;
-use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
-use Livewire\Component;
 
-class HomePageSearch extends Component implements HasSchemas
+class Home extends Page
 {
-    use InteractsWithSchemas;
+    protected string $view = 'filament.home.pages.home';
+
+    protected static ?string $slug = '/';
+
+    protected ?string $heading = '';
+
+    protected static bool $shouldRegisterNavigation = false;
 
     public ?array $data = [];
 
@@ -68,11 +71,6 @@ class HomePageSearch extends Component implements HasSchemas
     {
         $this->validate();
 
-        return redirect()->route('search.results', $this->data);
-    }
-
-    public function render()
-    {
-        return view('livewire.home-page-search');
+        return redirect()->route('filament.home.pages.search', $this->data);
     }
 }

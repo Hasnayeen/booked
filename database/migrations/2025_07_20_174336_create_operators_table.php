@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('status')->default('pending');
             $table->string('contact_email')->unique();
             $table->string('contact_phone')->nullable();
+            $table->string('logo')->nullable();
             $table->text('description')->nullable();
             $table->json('metadata')->nullable();
             $table->timestamps();

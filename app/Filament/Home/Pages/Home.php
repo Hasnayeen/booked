@@ -22,7 +22,7 @@ class Home extends Page
 
     public ?array $data = [];
 
-    public function mount()
+    public function mount(): void
     {
         $this->form->fill([]);
     }

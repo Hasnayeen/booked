@@ -93,7 +93,7 @@ class SeatDeck
         // Handle edge cases where row/column exceeds available labels
         $rowIndex = min($row - 1, count($rowLabels) - 1);
         $columnIndex = min($column - 1, count($columnLabels) - 1);
-        
+
         $rowLabel = $rowLabels[$rowIndex];
         $columnLabel = $columnLabels[$columnIndex];
 
@@ -121,6 +121,7 @@ class SeatDeck
 
         // Limit to 26 columns when using alphabetical labels
         $maxColumns = min($this->totalColumns, 26);
+
         return array_slice(range('A', 'Z'), 0, $maxColumns);
     }
 
@@ -132,6 +133,7 @@ class SeatDeck
 
         // Limit to 26 rows when using alphabetical labels
         $maxRows = min($this->totalRows, 26);
+
         return array_slice(range('A', 'Z'), 0, $maxRows);
     }
 

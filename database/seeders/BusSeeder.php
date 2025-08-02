@@ -19,6 +19,7 @@ class BusSeeder extends Seeder
 
         if (! $operator) {
             $this->command->warn('No operator found. Please run the main DatabaseSeeder first.');
+
             return;
         }
 
@@ -43,7 +44,7 @@ class BusSeeder extends Seeder
 
                     // Use factory with appropriate state for category
                     $factory = Bus::factory()->forOperator($operator);
-                    
+
                     $factory = match ($category) {
                         BusCategory::Luxury => $factory->luxury(),
                         BusCategory::Sleeper => $factory->sleeper(),

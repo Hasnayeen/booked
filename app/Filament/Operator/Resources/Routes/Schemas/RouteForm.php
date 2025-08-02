@@ -3,6 +3,7 @@
 namespace App\Filament\Operator\Resources\Routes\Schemas;
 
 use Carbon\Carbon;
+use Exception;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
@@ -47,7 +48,7 @@ class RouteForm
                                             ->maxLength(255)
                                             ->live(debounce: 500)
                                             ->helperText('Departure city')
-                                            ->afterStateUpdated(function (Set $set, Get $get, ?string $state) {
+                                            ->afterStateUpdated(function (Set $set, Get $get, ?string $state): void {
                                                 self::generateRouteName($set, $get);
                                             }),
 
@@ -56,7 +57,7 @@ class RouteForm
                                             ->maxLength(255)
                                             ->live(debounce: 500)
                                             ->helperText('Arrival city')
-                                            ->afterStateUpdated(function (Set $set, Get $get, ?string $state) {
+                                            ->afterStateUpdated(function (Set $set, Get $get, ?string $state): void {
                                                 self::generateRouteName($set, $get);
                                             }),
 
@@ -75,7 +76,7 @@ class RouteForm
                                             ->live(debounce: 500)
                                             ->seconds(false)
                                             ->helperText('Scheduled departure time')
-                                            ->afterStateUpdated(function (Set $set, Get $get, ?string $state) {
+                                            ->afterStateUpdated(function (Set $set, Get $get, ?string $state): void {
                                                 self::calculateEstimatedDuration($set, $get);
                                             }),
 
@@ -84,7 +85,7 @@ class RouteForm
                                             ->live(debounce: 500)
                                             ->seconds(false)
                                             ->helperText('Scheduled arrival time')
-                                            ->afterStateUpdated(function (Set $set, Get $get, ?string $state) {
+                                            ->afterStateUpdated(function (Set $set, Get $get, ?string $state): void {
                                                 self::calculateEstimatedDuration($set, $get);
                                             }),
 
@@ -119,31 +120,29 @@ class RouteForm
                                             ->required()
                                             ->live()
                                             ->afterStateUpdated(fn ($set) => $set('value', null)),
-                                        
+
                                         Select::make('value')
-                                            ->options(function (Get $get) {
-                                                return match ($get('type')) {
-                                                    'day' => [
-                                                        'monday' => 'Monday',
-                                                        'tuesday' => 'Tuesday',
-                                                        'wednesday' => 'Wednesday',
-                                                        'thursday' => 'Thursday',
-                                                        'friday' => 'Friday',
-                                                        'saturday' => 'Saturday',
-                                                        'sunday' => 'Sunday',
-                                                    ],
-                                                    'date' => [],
-                                                    default => [],
-                                                };
+                                            ->options(fn (Get $get): array => match ($get('type')) {
+                                                'day' => [
+                                                    'monday' => 'Monday',
+                                                    'tuesday' => 'Tuesday',
+                                                    'wednesday' => 'Wednesday',
+                                                    'thursday' => 'Thursday',
+                                                    'friday' => 'Friday',
+                                                    'saturday' => 'Saturday',
+                                                    'sunday' => 'Sunday',
+                                                ],
+                                                'date' => [],
+                                                default => [],
                                             })
-                                            ->visible(fn (Get $get) => $get('type') === 'day')
+                                            ->visible(fn (Get $get): bool => $get('type') === 'day')
                                             ->placeholder('Select day')
-                                            ->required(fn (Get $get) => $get('type') === 'day'),
+                                            ->required(fn (Get $get): bool => $get('type') === 'day'),
 
                                         DatePicker::make('value')
-                                            ->visible(fn (Get $get) => $get('type') === 'date')
+                                            ->visible(fn (Get $get): bool => $get('type') === 'date')
                                             ->placeholder('Select date')
-                                            ->required(fn (Get $get) => $get('type') === 'date'),
+                                            ->required(fn (Get $get): bool => $get('type') === 'date'),
                                     ])
                                     ->columns(2)
                                     ->helperText('Add days or specific dates when this route is not available')
@@ -161,7 +160,7 @@ class RouteForm
                                             ->placeholder('e.g., Central Station, Main Square')
                                             ->maxLength(255)
                                             ->required(),
-                                        
+
                                         TimePicker::make('time')
                                             ->label('Time')
                                             ->seconds(false)
@@ -180,7 +179,7 @@ class RouteForm
                                             ->placeholder('e.g., Terminal A, Gate 5')
                                             ->maxLength(255)
                                             ->required(),
-                                        
+
                                         TimePicker::make('time')
                                             ->label('Time')
                                             ->seconds(false)
@@ -199,7 +198,7 @@ class RouteForm
                                             ->placeholder('e.g., Terminal B, Station Exit')
                                             ->maxLength(255)
                                             ->required(),
-                                        
+
                                         TimePicker::make('time')
                                             ->label('Time')
                                             ->seconds(false)
@@ -227,7 +226,7 @@ class RouteForm
             ]);
     }
 
-    private static function calculateEstimatedDuration($set, $get): void
+    private static function calculateEstimatedDuration(Set $set, Get $get): void
     {
         $departureTime = $get('departure_time');
         $arrivalTime = $get('arrival_time');
@@ -251,12 +250,12 @@ class RouteForm
             $estimatedDuration = sprintf('%02d:%02d', $duration->h, $duration->i);
 
             $set('estimated_duration', $estimatedDuration);
-        } catch (\Exception) {
+        } catch (Exception) {
             $set('estimated_duration', null);
         }
     }
 
-    private static function generateRouteName($set, $get): void
+    private static function generateRouteName(Set $set, Get $get): void
     {
         $originCity = $get('origin_city');
         $destinationCity = $get('destination_city');
@@ -272,7 +271,7 @@ class RouteForm
         }
 
         // Generate route name in format: "Origin to Destination"
-        $autoRouteName = trim($originCity) . ' to ' . trim($destinationCity);
+        $autoRouteName = trim((string) $originCity) . ' to ' . trim((string) $destinationCity);
         $set('route_name', $autoRouteName);
     }
 }

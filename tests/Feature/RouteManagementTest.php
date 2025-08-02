@@ -1,18 +1,18 @@
 <?php
 
 use App\Filament\Operator\Resources\Routes\Pages\CreateRoute;
-use App\Filament\Operator\Resources\Routes\Pages\EditRoute;
 use App\Filament\Operator\Resources\Routes\Pages\ListRoutes;
 use App\Models\Bus;
 use App\Models\Operator;
-use App\Models\Route;
+use App\Models\Permission;
 use App\Models\Role;
+use App\Models\Route;
 use App\Models\User;
 
 use function Pest\Livewire\livewire;
 
-describe('Route Management', function () {
-    beforeEach(function () {
+describe('Route Management', function (): void {
+    beforeEach(function (): void {
         $this->operator = Operator::factory()->create(['status' => 'approved']);
         $this->otherOperator = Operator::factory()->create(['status' => 'approved']);
 
@@ -40,8 +40,8 @@ describe('Route Management', function () {
         filament()->setTenant($this->operator);
     });
 
-    describe('Route Creation', function () {
-        it('can create route through filament admin panel', function () {
+    describe('Route Creation', function (): void {
+        it('can create route through filament admin panel', function (): void {
             $this->actingAs($this->adminUser);
 
             livewire(CreateRoute::class)
@@ -82,14 +82,14 @@ describe('Route Management', function () {
             ]);
 
             $route = Route::where('route_name', 'Downtown Express')->first();
-            expect($route->estimated_duration)->toBe('04:30');
+            expect($route->estimated_duration)->toBe('4h 30m');
             expect($route->off_days)->toBe([['type' => 'day', 'value' => 'sunday']]);
             expect($route->stops)->toBe([['stop' => 'Central Station', 'time' => '08:30'], ['stop' => 'Airport Terminal', 'time' => '09:00']]);
             expect($route->boarding_points)->toBe([['point' => 'Platform A', 'time' => '07:45']]);
             expect($route->drop_off_points)->toBe([['point' => 'Terminal B', 'time' => '12:45']]);
         });
 
-        it('can create route with specific date off days', function () {
+        it('can create route with specific date off days', function (): void {
             $this->actingAs($this->adminUser);
 
             livewire(CreateRoute::class)
@@ -118,7 +118,7 @@ describe('Route Management', function () {
             ]);
         });
 
-        it('can create route with mixed off days (dates and weekdays)', function () {
+        it('can create route with mixed off days (dates and weekdays)', function (): void {
             $this->actingAs($this->adminUser);
 
             livewire(CreateRoute::class)
@@ -146,7 +146,7 @@ describe('Route Management', function () {
             expect($route->off_days[3])->toBe(['type' => 'date', 'value' => '2025-11-28']);
         });
 
-        it('automatically calculates estimated duration from departure and arrival times', function () {
+        it('automatically calculates estimated duration from departure and arrival times', function (): void {
             $this->actingAs($this->adminUser);
 
             // Test normal same-day route
@@ -164,10 +164,10 @@ describe('Route Management', function () {
                 ->assertHasNoFormErrors();
 
             $route = Route::where('route_name', 'Morning Route')->first();
-            expect($route->estimated_duration)->toBe('04:45');
+            expect($route->estimated_duration)->toBe('4h 45m');
         });
 
-        it('correctly calculates estimated duration for overnight routes', function () {
+        it('correctly calculates estimated duration for overnight routes', function (): void {
             $this->actingAs($this->adminUser);
 
             // Test overnight route (departure 23:30, arrival 03:15 next day)
@@ -185,10 +185,10 @@ describe('Route Management', function () {
                 ->assertHasNoFormErrors();
 
             $route = Route::where('route_name', 'Overnight Express')->first();
-            expect($route->estimated_duration)->toBe('03:45');
+            expect($route->estimated_duration)->toBe('3h 45m');
         });
 
-        it('validates required fields when creating route', function () {
+        it('validates required fields when creating route', function (): void {
             $this->actingAs($this->adminUser);
 
             livewire(CreateRoute::class)
@@ -211,8 +211,8 @@ describe('Route Management', function () {
         });
     });
 
-    describe('Route Listing', function () {
-        it('can list routes through filament admin panel', function () {
+    describe('Route Listing', function (): void {
+        it('can list routes through filament admin panel', function (): void {
             $this->actingAs($this->adminUser);
 
             Route::factory()->count(3)->create([
@@ -224,9 +224,9 @@ describe('Route Management', function () {
                 ->assertCanSeeTableRecords(Route::where('operator_id', $this->operator->id)->get());
         });
 
-        it('cannot see other operators routes', function () {
+        it('cannot see other operators routes', function (): void {
             $this->actingAs($this->adminUser);
-            
+
             $response = $this->get("/operator/{$this->operator->id}/routes");
 
             $response->assertStatus(200)
@@ -235,15 +235,15 @@ describe('Route Management', function () {
         });
     });
 
-    describe('Route Authorization', function () {
-        it('restricts access for users without proper permissions', function () {
+    describe('Route Authorization', function (): void {
+        it('restricts access for users without proper permissions', function (): void {
             // Remove manage_routes permission from staff role for this test
-            $manageRoutesPermission = \App\Models\Permission::where('name', 'manage_routes')->first();
+            $manageRoutesPermission = Permission::where('name', 'manage_routes')->first();
             $this->staffRole->permissions()->detach($manageRoutesPermission->id);
-            
+
             $user = User::factory()->create();
             $this->operator->users()->attach($user, ['role_id' => $this->staffRole->id]);
-            
+
             $this->actingAs($user);
             filament()->setTenant($this->operator);
 

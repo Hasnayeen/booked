@@ -11,6 +11,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -104,7 +105,7 @@ class BusForm
                                     ->default('1')
                                     ->required()
                                     ->helperText('Select the deck type of the bus')
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
                                         self::calculateTotalSeats($set, $get);
                                     }),
 
@@ -131,7 +132,7 @@ class BusForm
                                     ]),
 
                                 Tab::make('Upper Deck')
-                                    ->visible(fn (Get $get) => $get('deck') === '2')
+                                    ->visible(fn (Get $get): bool => $get('deck') === '2')
                                     ->schema([
                                         View::make('filament.schemas.components.bus_seat_layout')
                                             ->viewData([
@@ -145,7 +146,7 @@ class BusForm
             ]);
     }
 
-    public static function getLowerDeckSeatConfig()
+    public static function getLowerDeckSeatConfig(): Component
     {
         return Fieldset::make('lower_deck')
             ->label('Seat Layout (Lower Deck)')
@@ -171,7 +172,7 @@ class BusForm
                     ->maxValue(4)
                     ->default(4)
                     ->helperText('Number of seat per row (2-4)')
-                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
                         // Reset column layout to a valid option when columns change
                         $validLayouts = match ((int) $state) {
                             2 => '1:1',
@@ -196,7 +197,7 @@ class BusForm
 
                 Select::make('column_layout')
                     ->live()
-                    ->options(fn (Get $get) => match ((int) $get('total_columns')) {
+                    ->options(fn (Get $get): array => match ((int) $get('total_columns')) {
                         2 => ['1:1' => '1:1 (Left: 1, Right: 1)'],
                         3 => ['2:1' => '2:1 (Left: 2, Right: 1)', '1:2' => '1:2 (Left: 1, Right: 2)'],
                         4 => ['2:2' => '2:2 (Left: 2, Right: 2)'],
@@ -214,7 +215,7 @@ class BusForm
                     ->maxValue(10)
                     ->default(5)
                     ->helperText('Number of rows (5-10)')
-                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
                         self::calculateTotalSeats($set, $get);
                     }),
 
@@ -239,11 +240,11 @@ class BusForm
             ]);
     }
 
-    public static function getUpperDeckSeatConfig()
+    public static function getUpperDeckSeatConfig(): Component
     {
         return Fieldset::make('upper_deck')
             ->label('Seat Layout (Upper Deck)')
-            ->visible(fn (Get $get) => $get('deck') === '2')
+            ->visible(fn (Get $get): bool => $get('deck') === '2')
             ->columnSpanFull()
             ->schema([
                 ToggleButtons::make('seat_type_upper')
@@ -268,7 +269,7 @@ class BusForm
                     ->maxValue(4)
                     ->default(4)
                     ->helperText('Number of seat per row (2-4)')
-                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
                         // Reset column layout to a valid option when columns change
                         $validLayouts = match ((int) $state) {
                             2 => '1:1',
@@ -295,7 +296,7 @@ class BusForm
                 Select::make('column_layout_upper')
                     ->label('Column Layout')
                     ->live()
-                    ->options(fn (Get $get) => match ((int) $get('total_columns_upper')) {
+                    ->options(fn (Get $get): array => match ((int) $get('total_columns_upper')) {
                         2 => ['1:1' => '1:1 (Left: 1, Right: 1)'],
                         3 => ['2:1' => '2:1 (Left: 2, Right: 1)', '1:2' => '1:2 (Left: 1, Right: 2)'],
                         4 => ['2:2' => '2:2 (Left: 2, Right: 2)'],
@@ -314,7 +315,7 @@ class BusForm
                     ->maxValue(10)
                     ->default(5)
                     ->helperText('Number of rows (5-10)')
-                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                    ->afterStateUpdated(function ($state, callable $set, callable $get): void {
                         self::calculateTotalSeats($set, $get);
                     }),
 

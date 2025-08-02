@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Models\Operator;
 use App\Models\Route;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class RoutePolicy
 {

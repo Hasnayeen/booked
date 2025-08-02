@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -43,8 +44,8 @@ class Route extends Model
                     return null;
                 }
 
-                $departure = \Carbon\Carbon::parse($this->departure_time);
-                $arrival = \Carbon\Carbon::parse($this->arrival_time);
+                $departure = Carbon::parse($this->departure_time);
+                $arrival = Carbon::parse($this->arrival_time);
 
                 // Handle overnight routes (arrival next day)
                 if ($arrival->lt($departure)) {
@@ -52,7 +53,7 @@ class Route extends Model
                 }
 
                 return $departure->diff($arrival)->format('%hh %Im');
-            }
+            },
         );
     }
 

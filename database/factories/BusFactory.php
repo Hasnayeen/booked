@@ -26,7 +26,7 @@ class BusFactory extends Factory
     public function definition(): array
     {
         $totalSeats = fake()->numberBetween(20, 60);
-        
+
         return [
             'operator_id' => Operator::factory(),
             'bus_number' => fake()->unique()->bothify('BUS-###??'),
@@ -70,20 +70,20 @@ class BusFactory extends Factory
         $seatType = fake()->randomElement(['1', '2']); // 1 = seat, 2 = sleeper
         $columnLabel = fake()->randomElement(['alpha', 'numeric']);
         $rowLabel = fake()->randomElement(['alpha', 'numeric']);
-        
+
         // Different layouts based on seat count
         $layouts = ['2:2', '1:2', '2:1', '1:1'];
         $columnLayout = fake()->randomElement($layouts);
-        
+
         // Calculate rows and columns to approximate total seats
         $columns = $this->getColumnsFromLayout($columnLayout);
         $rows = max(1, (int) ceil($totalSeats / $columns));
-        
+
         // Base price varies by seat type
-        $basePrice = $seatType === '2' ? 
+        $basePrice = $seatType === '2' ?
             fake()->numberBetween(80000, 150000) : // Sleeper: $800-$1500
             fake()->numberBetween(30000, 80000);   // Regular: $300-$800
-        
+
         $lowerDeck = new SeatDeck(
             seatType: $seatType,
             totalColumns: $columns,
@@ -93,13 +93,13 @@ class BusFactory extends Factory
             rowLabel: $rowLabel,
             pricePerSeatInCents: $basePrice,
         );
-        
+
         $upperDeck = null;
         if ($deckType === '2') {
             // Upper deck typically has fewer seats and may be more expensive
             $upperRows = max(1, (int) ceil($rows * 0.6)); // 60% of lower deck
             $upperPrice = (int) ($basePrice * fake()->randomFloat(2, 1.1, 1.5)); // 10-50% more expensive
-            
+
             $upperDeck = new SeatDeck(
                 seatType: $seatType,
                 totalColumns: $columns,
@@ -110,7 +110,7 @@ class BusFactory extends Factory
                 pricePerSeatInCents: $upperPrice,
             );
         }
-        
+
         return new SeatConfiguration(
             deckType: $deckType,
             lowerDeck: $lowerDeck,
@@ -124,6 +124,7 @@ class BusFactory extends Factory
     private function getColumnsFromLayout(string $layout): int
     {
         $parts = explode(':', $layout);
+
         return array_sum(array_map('intval', $parts));
     }
 
@@ -154,7 +155,7 @@ class BusFactory extends Factory
     {
         return $this->state(function (array $attributes): array {
             $totalSeats = fake()->numberBetween(20, 40); // Luxury buses have fewer seats
-            
+
             // Luxury buses often have 1:1 or 1:2 layout for more space
             $seatConfig = new SeatConfiguration(
                 deckType: '1', // Usually single deck for luxury
@@ -169,7 +170,7 @@ class BusFactory extends Factory
                 ),
                 upperDeck: null, // Single deck, so no upper deck
             );
-            
+
             return [
                 'category' => BusCategory::Luxury,
                 'total_seats' => $totalSeats,
@@ -199,7 +200,7 @@ class BusFactory extends Factory
     {
         return $this->state(function (array $attributes): array {
             $totalSeats = fake()->numberBetween(24, 36); // Sleeper buses have berths
-            
+
             // Sleeper buses typically have 2:1 or 1:2 layout for berths
             $seatConfig = new SeatConfiguration(
                 deckType: $doubleDecker = fake()->boolean(70) ? '2' : '1', // 70% chance of double deck for sleepers
@@ -212,17 +213,17 @@ class BusFactory extends Factory
                     rowLabel: 'numeric',
                     pricePerSeatInCents: fake()->numberBetween(80000, 120000), // $800-$1200
                 ),
-                upperDeck: $doubleDecker ? new SeatDeck(
+                upperDeck: $doubleDecker !== '' && $doubleDecker !== '0' ? new SeatDeck(
                     seatType: '2',
                     totalColumns: 3,
-                    columnLabel: 'alpha', 
+                    columnLabel: 'alpha',
                     columnLayout: fake()->randomElement(['2:1', '1:2']),
                     totalRows: (int) ceil($totalSeats / 6), // Half the berths on upper deck
                     rowLabel: 'numeric',
                     pricePerSeatInCents: fake()->numberBetween(85000, 125000), // Slightly more expensive
                 ) : null,
             );
-            
+
             return [
                 'category' => BusCategory::Sleeper,
                 'total_seats' => $totalSeats,
@@ -250,7 +251,7 @@ class BusFactory extends Factory
     {
         return $this->state(function (array $attributes): array {
             $totalSeats = fake()->numberBetween(40, 60); // Standard buses have more seats
-            
+
             // Standard buses typically use 2:2 layout for maximum capacity
             $seatConfig = new SeatConfiguration(
                 deckType: '1', // Usually single deck
@@ -265,7 +266,7 @@ class BusFactory extends Factory
                 ),
                 upperDeck: null, // Single deck, so no upper deck
             );
-            
+
             return [
                 'category' => BusCategory::Economy,
                 'total_seats' => $totalSeats,

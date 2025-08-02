@@ -15,7 +15,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Bus extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use SoftDeletes;
 
     /**
      * Get the attributes that should be cast.

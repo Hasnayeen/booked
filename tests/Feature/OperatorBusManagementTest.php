@@ -219,7 +219,7 @@ describe('Operator Bus Management', function (): void {
 
             livewire(ViewBus::class, ['record' => $this->bus->getRouteKey()])
                 ->assertSee($this->bus->bus_number)
-                ->assertSee(ucwords($this->bus->category->value))
+                ->assertSee(ucwords((string) $this->bus->category->value))
                 ->assertSee($this->bus->type->getLabel())
                 ->assertSee($this->bus->total_seats)
                 ->assertSuccessful();

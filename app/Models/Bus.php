@@ -119,4 +119,24 @@ class Bus extends Model
             get: fn (): int => $this->seat_config?->getBasePriceInCents() ?? 0,
         );
     }
+
+    /**
+     * Get the maximum price from the seat configuration.
+     */
+    protected function maxPrice(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): int => $this->seat_config?->getMaxPriceInCents() ?? 0,
+        );
+    }
+
+    /**
+     * Get all prices from the seat configuration.
+     */
+    protected function allPrices(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): array => $this->seat_config?->getAllPricesInCents() ?? [],
+        );
+    }
 }

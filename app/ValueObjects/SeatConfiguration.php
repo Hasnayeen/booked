@@ -207,4 +207,15 @@ class SeatConfiguration
 
         return $lowerPrice;
     }
+
+    public function getAllPricesInCents(): array
+    {
+        $prices = [$this->lowerDeck->pricePerSeatInCents];
+
+        if ($this->upperDeck instanceof SeatDeck) {
+            $prices[] = $this->upperDeck->pricePerSeatInCents;
+        }
+
+        return $prices;
+    }
 }

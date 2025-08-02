@@ -110,7 +110,7 @@ class Search extends Page
             ]);
     }
 
-    public function search(): never
+    public function search(): void
     {
         $this->validate([
             'from' => 'required|string|max:255',
@@ -119,7 +119,10 @@ class Search extends Page
             'passengers' => 'required|in:1,2,3,4,5',
         ]);
 
-        dd($this->from, $this->to, $this->date, $this->passengers);
+        $this->from = $this->form->getState()['from'];
+        $this->to = $this->form->getState()['to'];
+        $this->date = $this->form->getState()['date'];
+        $this->passengers = $this->form->getState()['passengers'];
     }
 
     private function getSearchFiltersComponents(): Component
@@ -172,6 +175,16 @@ class Search extends Page
             ->contained(false)
             ->columnSpan(9)
             ->schema([
+                Section::make()
+                    ->visible(fn (array $record): bool => count($record) === 0)
+                    ->schema([
+                        TextEntry::make('no_results')
+                            ->hiddenLabel()
+                            ->alignCenter()
+                            ->size('lg')
+                            ->weight('bold')
+                            ->state('0 results found'),
+                    ]),
                 RepeatableEntry::make('*')
                     ->hiddenLabel()
                     ->contained(false)
@@ -228,18 +241,34 @@ class Search extends Page
                             ])
                             ->footer([
                                 Flex::make([
-                                    TextEntry::make('bus.min_price')
-                                        ->hiddenLabel()
-                                        ->money('USD', 100)
-                                        ->color('primary')
-                                        ->size('lg')
-                                        ->weight('bold'),
+                                    Flex::make([
+                                        TextEntry::make('bus.all_prices')
+                                            ->hiddenLabel()
+                                            ->color('primary')
+                                            ->size('lg')
+                                            ->weight('bold')
+                                            ->state(fn ($record) => array_map(fn ($price) => $price * $this->passengers, $record->bus->all_prices))
+                                            ->money('USD', 100)
+                                            ->listWithLineBreaks()
+                                            ->grow(false),
+                                        TextEntry::make('bus.all_prices')
+                                            ->hiddenLabel()
+                                            ->size('md')
+                                            ->money('USD', 100)
+                                            ->listWithLineBreaks()
+                                            ->extraAttributes(['class' => 'text-gray-600 [&_li]:text-gray-600'])
+                                            ->grow(false),
+                                        TextEntry::make('bus.all_prices')
+                                            ->hiddenLabel()
+                                            ->size('sm')
+                                            ->extraAttributes(['class' => 'text-gray-600'])
+                                            ->state('/  Seat')
+                                            ->listWithLineBreaks(),
+                                    ])->extraAttributes(['class' => 'items-center']),
                                     Action::make('book')
                                         ->label('Book Now')
                                         ->icon(LucideIcon::Ticket)
                                         ->outlined()
-                                        ->url(fn (Route $record): Route => $record)
-                                        ->openUrlInNewTab()
                                         ->button(),
                                 ])->columnSpanFull()->extraAttributes([
                                     'class' => 'search-result-footer items-center',

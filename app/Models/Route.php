@@ -51,7 +51,7 @@ class Route extends Model
                     $arrival->addDay();
                 }
 
-                return $departure->diff($arrival)->format('%H:%I');
+                return $departure->diff($arrival)->format('%hh %Im');
             }
         );
     }

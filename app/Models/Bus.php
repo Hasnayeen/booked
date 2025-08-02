@@ -108,4 +108,14 @@ class Bus extends Model
             return $this->total_seats - $bookedSeats;
         });
     }
+
+    /**
+     * Get the minimum price from the seat configuration.
+     */
+    protected function minPrice(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): int => $this->seat_config?->getBasePriceInCents() ?? 0,
+        );
+    }
 }

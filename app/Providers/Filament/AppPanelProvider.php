@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Resources\Bookings\Pages\ListBusBookings;
 use App\Filament\Resources\Bookings\Pages\ListHotelBookings;
+use App\Http\Middleware\PanelCommonConfig;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -30,13 +31,9 @@ class AppPanelProvider extends PanelProvider
             ->id('app')
             ->path('app')
             ->login()
-            ->brandLogo(asset('logo.svg'))
             ->colors([
                 'primary' => Color::Violet,
             ])
-            ->viteTheme('resources/css/theme.css')
-            ->sidebarWidth('18rem')
-            ->topbar(false)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
@@ -54,6 +51,7 @@ class AppPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                PanelCommonConfig::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
@@ -66,6 +64,9 @@ class AppPanelProvider extends PanelProvider
     {
         Event::listen(function (\Filament\Events\ServingFilament $event) {
             $panel = filament()->getCurrentPanel();
+            if ($panel->getId() !== 'app') {
+                return;
+            }
             $panel->navigationItems([
                 NavigationItem::make()
                     ->label('Hotel')

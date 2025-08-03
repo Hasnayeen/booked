@@ -32,7 +32,7 @@ class PanelCommonConfig
 
         $panel = filament()->getCurrentPanel();
         $panel->brandLogo(asset('logo.svg'))
-            ->viteTheme('resources/css/theme.css')
+            ->viteTheme('resources/css/app.css')
             ->sidebarWidth('18rem')
             ->topbar(false);
 

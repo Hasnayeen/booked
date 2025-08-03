@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Home\Pages;
+namespace App\Filament\Guest\Pages;
 
 use App\Enums\BusCategory;
 use App\Enums\BusType;

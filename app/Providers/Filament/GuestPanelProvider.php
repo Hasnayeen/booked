@@ -15,22 +15,22 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-class HomePanelProvider extends PanelProvider
+class GuestPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('home')
+            ->id('guest')
             ->path('/')
             ->colors([
                 'primary' => Color::Violet,
             ])
-            ->viteTheme('resources/css/app.css')
+            ->viteTheme('resources/css/guest.css')
             ->topNavigation()
             ->topbar()
-            ->discoverResources(in: app_path('Filament/Home/Resources'), for: 'App\Filament\Home\Resources')
-            ->discoverPages(in: app_path('Filament/Home/Pages'), for: 'App\Filament\Home\Pages')
-            ->discoverWidgets(in: app_path('Filament/Home/Widgets'), for: 'App\Filament\Home\Widgets')
+            ->discoverResources(in: app_path('Filament/Guest/Resources'), for: 'App\Filament\Guest\Resources')
+            ->discoverPages(in: app_path('Filament/Guest/Pages'), for: 'App\Filament\Guest\Pages')
+            ->discoverWidgets(in: app_path('Filament/Guest/Widgets'), for: 'App\Filament\Guest\Widgets')
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

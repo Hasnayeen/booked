@@ -1,0 +1,31 @@
+@import '../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../app/**/*';
+@source '../../resources/views/filament/home/**/*';
+@source '../../resources/views/filament/schemas/**/*';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-inter: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+.fi-main {
+    @apply max-w-full;
+}
+
+.fi-main:has(.fi-page-home) {
+    @apply px-0;
+}
+
+.fi-page-home .fi-page-content {
+    @apply gap-y-0;
+}
+
+.fi-page-home .fi-page-header-main-ctn {
+    @apply py-0;
+}
+
+div:has(.fi-sc-component .search-result-footer) {
+    @apply w-full;
+}

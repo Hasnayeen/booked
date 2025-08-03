@@ -2,10 +2,13 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\Bookings\Pages\ListBusBookings;
+use App\Filament\Resources\Bookings\Pages\ListHotelBookings;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -15,6 +18,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Event;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AppPanelProvider extends PanelProvider
@@ -56,5 +60,26 @@ class AppPanelProvider extends PanelProvider
             ])
             ->strictAuthorization()
             ->databaseNotifications();
+    }
+
+    public function boot(): void
+    {
+        Event::listen(function (\Filament\Events\ServingFilament $event) {
+            $panel = filament()->getCurrentPanel();
+            $panel->navigationItems([
+                NavigationItem::make()
+                    ->label('Hotel')
+                    ->icon('lucide-hotel')
+                    ->group('Bookings')
+                    ->isActiveWhen(fn () => request()->fullUrlIs(ListHotelBookings::getUrl()))
+                    ->url(ListHotelBookings::getUrl()),
+                NavigationItem::make()
+                    ->label('Bus')
+                    ->icon('lucide-bus')
+                    ->group('Bookings')
+                    ->isActiveWhen(fn () => request()->fullUrlIs(ListBusBookings::getUrl()))
+                    ->url(ListBusBookings::getUrl()),
+            ]);
+        });
     }
 }

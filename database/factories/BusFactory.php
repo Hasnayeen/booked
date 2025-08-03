@@ -202,8 +202,9 @@ class BusFactory extends Factory
             $totalSeats = fake()->numberBetween(24, 36); // Sleeper buses have berths
 
             // Sleeper buses typically have 2:1 or 1:2 layout for berths
+            $deckType = fake()->boolean(70) ? '2' : '1'; // 70% chance of double deck for sleepers
             $seatConfig = new SeatConfiguration(
-                deckType: $doubleDecker = fake()->boolean(70) ? '2' : '1', // 70% chance of double deck for sleepers
+                deckType: $deckType,
                 lowerDeck: new SeatDeck(
                     seatType: '2', // Sleeper berths
                     totalColumns: 3, // 2:1 or 1:2 layout
@@ -213,7 +214,7 @@ class BusFactory extends Factory
                     rowLabel: 'numeric',
                     pricePerSeatInCents: fake()->numberBetween(80000, 120000), // $800-$1200
                 ),
-                upperDeck: $doubleDecker !== '' && $doubleDecker !== '0' ? new SeatDeck(
+                upperDeck: $deckType === '2' ? new SeatDeck(
                     seatType: '2',
                     totalColumns: 3,
                     columnLabel: 'alpha',

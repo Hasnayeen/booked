@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Reset Faker's unique constraint to avoid duplicate issues
+        fake()->unique(true);
+
         // Call the role permission seeder first
         $this->call([
             RolePermissionSeeder::class,
@@ -52,6 +55,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             BusSeeder::class,
+            BookingSeeder::class,
         ]);
 
         $this->command->info('Database seeded successfully!');

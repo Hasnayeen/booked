@@ -23,7 +23,7 @@ class RoomFactory extends Factory
     {
         $roomTypes = ['standard', 'deluxe', 'suite', 'presidential', 'family', 'twin', 'single'];
         $roomType = fake()->randomElement($roomTypes);
-        
+
         // Price varies by room type
         $priceRanges = [
             'standard' => [3000, 8000],     // $30-80
@@ -35,7 +35,7 @@ class RoomFactory extends Factory
             'single' => [2500, 6000],       // $25-60
         ];
 
-        $capacity = match($roomType) {
+        $capacity = match ($roomType) {
             'single' => 1,
             'twin' => 2,
             'standard' => fake()->numberBetween(1, 2),
@@ -91,29 +91,27 @@ class RoomFactory extends Factory
      */
     public function luxury(): static
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'type' => fake()->randomElement(['suite', 'presidential']),
-                'price_per_night' => fake()->numberBetween(20000, 80000),
-                'capacity' => fake()->numberBetween(2, 6),
-                'amenities' => [
-                    'wifi',
-                    'air_conditioning',
-                    'television',
-                    'mini_bar',
-                    'room_service',
-                    'balcony',
-                    'city_view',
-                    'jacuzzi',
-                    'kitchenette',
-                    'safe',
-                    'concierge_service',
-                    'butler_service',
-                    'premium_linens',
-                ],
-                'description' => 'Luxurious accommodations with premium amenities and exceptional service.',
-            ];
-        });
+        return $this->state(fn (array $attributes): array => [
+            'type' => fake()->randomElement(['suite', 'presidential']),
+            'price_per_night' => fake()->numberBetween(20000, 80000),
+            'capacity' => fake()->numberBetween(2, 6),
+            'amenities' => [
+                'wifi',
+                'air_conditioning',
+                'television',
+                'mini_bar',
+                'room_service',
+                'balcony',
+                'city_view',
+                'jacuzzi',
+                'kitchenette',
+                'safe',
+                'concierge_service',
+                'butler_service',
+                'premium_linens',
+            ],
+            'description' => 'Luxurious accommodations with premium amenities and exceptional service.',
+        ]);
     }
 
     /**
@@ -121,20 +119,18 @@ class RoomFactory extends Factory
      */
     public function budget(): static
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'type' => fake()->randomElement(['standard', 'single']),
-                'price_per_night' => fake()->numberBetween(2000, 6000),
-                'capacity' => fake()->numberBetween(1, 2),
-                'amenities' => fake()->randomElements([
-                    'wifi',
-                    'air_conditioning',
-                    'television',
-                    'safe',
-                ], fake()->numberBetween(2, 4)),
-                'description' => 'Comfortable and affordable accommodation with essential amenities.',
-            ];
-        });
+        return $this->state(fn (array $attributes): array => [
+            'type' => fake()->randomElement(['standard', 'single']),
+            'price_per_night' => fake()->numberBetween(2000, 6000),
+            'capacity' => fake()->numberBetween(1, 2),
+            'amenities' => fake()->randomElements([
+                'wifi',
+                'air_conditioning',
+                'television',
+                'safe',
+            ], fake()->numberBetween(2, 4)),
+            'description' => 'Comfortable and affordable accommodation with essential amenities.',
+        ]);
     }
 
     /**
@@ -142,24 +138,22 @@ class RoomFactory extends Factory
      */
     public function family(): static
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'type' => 'family',
-                'price_per_night' => fake()->numberBetween(8000, 20000),
-                'capacity' => fake()->numberBetween(4, 6),
-                'amenities' => [
-                    'wifi',
-                    'air_conditioning',
-                    'television',
-                    'mini_bar',
-                    'kitchenette',
-                    'safe',
-                    'extra_bed',
-                    'children_amenities',
-                ],
-                'description' => 'Spacious room perfect for families with children, featuring additional space and family-friendly amenities.',
-            ];
-        });
+        return $this->state(fn (array $attributes): array => [
+            'type' => 'family',
+            'price_per_night' => fake()->numberBetween(8000, 20000),
+            'capacity' => fake()->numberBetween(4, 6),
+            'amenities' => [
+                'wifi',
+                'air_conditioning',
+                'television',
+                'mini_bar',
+                'kitchenette',
+                'safe',
+                'extra_bed',
+                'children_amenities',
+            ],
+            'description' => 'Spacious room perfect for families with children, featuring additional space and family-friendly amenities.',
+        ]);
     }
 
     /**
@@ -167,20 +161,18 @@ class RoomFactory extends Factory
      */
     public function unavailable(): static
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'is_available' => false,
-                'metadata' => [
-                    'reason' => fake()->randomElement([
-                        'maintenance',
-                        'renovation',
-                        'deep_cleaning',
-                        'repair',
-                        'reserved',
-                    ]),
-                    'expected_available_date' => fake()->dateTimeBetween('now', '+30 days')->format('Y-m-d'),
-                ],
-            ];
-        });
+        return $this->state(fn (array $attributes): array => [
+            'is_available' => false,
+            'metadata' => [
+                'reason' => fake()->randomElement([
+                    'maintenance',
+                    'renovation',
+                    'deep_cleaning',
+                    'repair',
+                    'reserved',
+                ]),
+                'expected_available_date' => fake()->dateTimeBetween('now', '+30 days')->format('Y-m-d'),
+            ],
+        ]);
     }
 }

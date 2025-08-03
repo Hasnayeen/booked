@@ -24,7 +24,7 @@ class BusBookingFactory extends Factory
     {
         $passengerCount = fake()->numberBetween(1, 4);
         $seatNumbers = $this->generateSeatNumbers($passengerCount);
-        
+
         $baseFarePerSeat = fake()->numberBetween(1000, 15000); // $10 - $150 per seat in cents
         $totalBaseFare = $baseFarePerSeat * $passengerCount;
         $taxes = (int) ($totalBaseFare * 0.05); // 5% tax
@@ -76,17 +76,18 @@ class BusBookingFactory extends Factory
     {
         $seatNumbers = [];
         $usedSeats = [];
-        
+
         for ($i = 0; $i < $count; $i++) {
             do {
                 $seatNumber = fake()->numberBetween(1, 45);
             } while (in_array($seatNumber, $usedSeats));
-            
+
             $usedSeats[] = $seatNumber;
             $seatNumbers[] = $seatNumber;
         }
-        
+
         sort($seatNumbers);
+
         return $seatNumbers;
     }
 
@@ -96,7 +97,7 @@ class BusBookingFactory extends Factory
     private function generatePassengerDetails(int $count): array
     {
         $passengers = [];
-        
+
         for ($i = 0; $i < $count; $i++) {
             $passengers[] = [
                 'name' => fake()->name(),
@@ -109,7 +110,7 @@ class BusBookingFactory extends Factory
                 'emergency_phone' => fake()->optional()->phoneNumber(),
             ];
         }
-        
+
         return $passengers;
     }
 
@@ -118,9 +119,9 @@ class BusBookingFactory extends Factory
      */
     public function singlePassenger(): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function (array $attributes): array {
             $baseFarePerSeat = fake()->numberBetween(500, 8000);
-            
+
             return [
                 'passenger_count' => 1,
                 'seat_numbers' => [fake()->numberBetween(1, 45)],
@@ -136,11 +137,11 @@ class BusBookingFactory extends Factory
      */
     public function groupBooking(): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function (array $attributes): array {
             $passengerCount = fake()->numberBetween(4, 8);
             $baseFarePerSeat = fake()->numberBetween(2000, 12000);
             $totalBaseFare = $baseFarePerSeat * $passengerCount;
-            
+
             return [
                 'passenger_count' => $passengerCount,
                 'seat_numbers' => $this->generateSeatNumbers($passengerCount),
@@ -158,11 +159,11 @@ class BusBookingFactory extends Factory
      */
     public function premiumService(): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function (array $attributes): array {
             $passengerCount = fake()->numberBetween(1, 2);
             $baseFarePerSeat = fake()->numberBetween(8000, 25000); // Higher premium fares
             $totalBaseFare = $baseFarePerSeat * $passengerCount;
-            
+
             return [
                 'passenger_count' => $passengerCount,
                 'base_fare_per_seat' => $baseFarePerSeat,

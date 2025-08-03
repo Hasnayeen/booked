@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Resources\Bookings\Pages\ListBusBookings;
 use App\Filament\Resources\Bookings\Pages\ListHotelBookings;
+use Filament\Events\ServingFilament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -64,7 +65,7 @@ class AppPanelProvider extends PanelProvider
 
     public function boot(): void
     {
-        Event::listen(function (\Filament\Events\ServingFilament $event) {
+        Event::listen(function (ServingFilament $event): void {
             $panel = filament()->getCurrentPanel();
             $panel->navigationItems([
                 NavigationItem::make()

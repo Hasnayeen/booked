@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Bus;
 use App\Models\BusBooking;
@@ -45,7 +44,7 @@ class BookingSeeder extends Seeder
             ]);
         }
 
-        $operators = $hotelOperators->merge($busOperators);
+        $hotelOperators->merge($busOperators);
         $users = User::all();
 
         // Create rooms and routes for these specific operators
@@ -75,7 +74,7 @@ class BookingSeeder extends Seeder
     {
         foreach ($hotelOperators as $operator) {
             $roomCount = Room::where('operator_id', $operator->id)->count();
-            
+
             if ($roomCount < 5) {
                 $this->command->info("Creating rooms for hotel operator: {$operator->name}");
                 // Create different types of rooms for this specific operator
@@ -95,7 +94,7 @@ class BookingSeeder extends Seeder
     {
         foreach ($busOperators as $operator) {
             $routeCount = Route::where('operator_id', $operator->id)->count();
-            
+
             if ($routeCount < 3) {
                 $this->command->info("Creating routes for bus operator: {$operator->name}");
                 Route::factory()->count(5)->for($operator)->create();

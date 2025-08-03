@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class HotelBooking extends Model
 {
     use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      */

@@ -25,11 +25,11 @@ class HotelBookingFactory extends Factory
         $checkInDate = fake()->dateTimeBetween('now', '+30 days');
         $checkOutDate = fake()->dateTimeBetween($checkInDate, $checkInDate->format('Y-m-d') . ' +7 days');
         $nights = $checkInDate->diff($checkOutDate)->days;
-        
+
         $adults = fake()->numberBetween(1, 4);
         $children = fake()->numberBetween(0, 2);
         $guests = $adults + $children;
-        
+
         $roomRatePerNight = fake()->numberBetween(5000, 50000); // $50 - $500 per night in cents
         $totalRoomAmount = $roomRatePerNight * $nights;
         $taxes = (int) ($totalRoomAmount * 0.1); // 10% tax
@@ -67,7 +67,7 @@ class HotelBookingFactory extends Factory
     private function generateGuestDetails(int $adults, int $children): array
     {
         $guests = [];
-        
+
         // Add adults
         for ($i = 0; $i < $adults; $i++) {
             $guests[] = [
@@ -78,7 +78,7 @@ class HotelBookingFactory extends Factory
                 'id_number' => fake()->bothify('???#######'),
             ];
         }
-        
+
         // Add children
         for ($i = 0; $i < $children; $i++) {
             $guests[] = [
@@ -87,7 +87,7 @@ class HotelBookingFactory extends Factory
                 'age' => fake()->numberBetween(2, 17),
             ];
         }
-        
+
         return $guests;
     }
 
@@ -96,15 +96,15 @@ class HotelBookingFactory extends Factory
      */
     public function weekend(): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function (array $attributes): array {
             $friday = fake()->dateTimeBetween('now', '+30 days')->modify('next friday');
             $sunday = clone $friday;
             $sunday->modify('+2 days');
-            
+
             $nights = 2;
             $roomRatePerNight = fake()->numberBetween(8000, 25000); // Higher weekend rates
             $totalRoomAmount = $roomRatePerNight * $nights;
-            
+
             return [
                 'check_in_date' => $friday,
                 'check_out_date' => $sunday,
@@ -121,14 +121,14 @@ class HotelBookingFactory extends Factory
      */
     public function longStay(): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function (array $attributes): array {
             $checkInDate = fake()->dateTimeBetween('now', '+14 days');
             $checkOutDate = fake()->dateTimeBetween($checkInDate->format('Y-m-d') . ' +7 days', $checkInDate->format('Y-m-d') . ' +30 days');
             $nights = $checkInDate->diff($checkOutDate)->days;
-            
+
             $roomRatePerNight = fake()->numberBetween(3000, 15000); // Discounted long stay rates
             $totalRoomAmount = $roomRatePerNight * $nights;
-            
+
             return [
                 'check_in_date' => $checkInDate,
                 'check_out_date' => $checkOutDate,

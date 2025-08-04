@@ -23,13 +23,13 @@ class RouteSchedulesTable
                     ->label('Route')
                     ->searchable()
                     ->sortable()
-                    ->description(fn ($record) => $record->route->origin_city . ' → ' . $record->route->destination_city),
+                    ->description(fn ($record): string => $record->route->origin_city . ' → ' . $record->route->destination_city),
 
                 TextColumn::make('bus.bus_number')
                     ->label('Bus')
                     ->searchable()
                     ->sortable()
-                    ->description(fn ($record) => $record->bus->category . ' • ' . $record->bus->type),
+                    ->description(fn ($record): string => $record->bus->category . ' • ' . $record->bus->type),
 
                 TextColumn::make('departure_time')
                     ->label('Departure')

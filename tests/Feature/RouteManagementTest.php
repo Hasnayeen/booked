@@ -150,8 +150,8 @@ describe('Route Management', function (): void {
                 ->assertHasNoFormErrors();
 
             $route = Route::where('origin_city', 'Los Angeles')
-                          ->where('destination_city', 'San Francisco')
-                          ->first();
+                ->where('destination_city', 'San Francisco')
+                ->first();
             expect($route->route_name)->toBe('Los Angeles to San Francisco');
         });
 

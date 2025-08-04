@@ -238,7 +238,7 @@ describe('Operator Bus Management', function (): void {
             // Base data for all buses
             $updatedData = [
                 'total_columns' => 4,
-                'total_rows' => 10,  
+                'total_rows' => 10,
                 'price_per_seat' => 1500,
                 'is_active' => false,
             ];

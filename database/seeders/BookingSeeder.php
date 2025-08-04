@@ -54,7 +54,7 @@ class BookingSeeder extends Seeder
 
         // Get the created rooms and routes
         $rooms = Room::whereIn('operator_id', $hotelOperators->pluck('id'))->get();
-        $routes = Route::whereIn('operator_id', $busOperators->pluck('id'))->get();
+        Route::whereIn('operator_id', $busOperators->pluck('id'))->get();
 
         // Create hotel bookings
         $this->createHotelBookings($hotelOperators, $users, $rooms);
@@ -99,7 +99,7 @@ class BookingSeeder extends Seeder
             if ($routeCount < 3) {
                 $this->command->info("Creating routes for bus operator: {$operator->name}");
                 $routes = Route::factory()->count(5)->for($operator)->create();
-                
+
                 // Create schedules for each route
                 $this->createSchedulesForRoutes($routes, $operator);
             }
@@ -112,20 +112,20 @@ class BookingSeeder extends Seeder
     private function createSchedulesForRoutes($routes, $operator): void
     {
         $buses = Bus::where('operator_id', $operator->id)->get();
-        
+
         // If no buses exist for this operator, create some
         if ($buses->isEmpty()) {
             $this->command->info("Creating buses for operator: {$operator->name}");
             $buses = Bus::factory()->count(3)->for($operator)->create();
         }
-        
+
         foreach ($routes as $route) {
             // Create 2-4 schedules per route with different times
             $scheduleCount = fake()->numberBetween(2, 4);
-            
+
             for ($i = 0; $i < $scheduleCount; $i++) {
                 $bus = $buses->random();
-                
+
                 RouteSchedule::factory()->create([
                     'operator_id' => $operator->id,
                     'route_id' => $route->id,
@@ -262,13 +262,14 @@ class BookingSeeder extends Seeder
         $this->command->info('Creating bus bookings...');
 
         // Get all route schedules for bus operators
-        $routeSchedules = RouteSchedule::whereHas('route', function ($query) use ($operators) {
+        $routeSchedules = RouteSchedule::whereHas('route', function ($query) use ($operators): void {
             $query->whereIn('operator_id', $operators->pluck('id'))
-                  ->where('is_active', true);
+                ->where('is_active', true);
         })->where('is_active', true)->get();
 
         if ($routeSchedules->isEmpty()) {
             $this->command->warn('No route schedules available for bus bookings');
+
             return;
         }
 

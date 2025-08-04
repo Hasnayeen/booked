@@ -35,7 +35,7 @@ class BusFactory extends Factory
             'total_seats' => $totalSeats,
             'license_plate' => fake()->unique()->bothify('??-##-???'),
             'is_active' => fake()->boolean(85), // 85% chance of being active
-            'seat_config' => $this->generateSeatConfiguration($totalSeats),
+            'seat_config' => $this->generateSeatConfiguration(),
             'amenities' => fake()->randomElements([
                 'WiFi',
                 'Air Conditioning',
@@ -64,29 +64,26 @@ class BusFactory extends Factory
     /**
      * Generate a realistic seat configuration based on total seats.
      */
-    private function generateSeatConfiguration(int $totalSeats): SeatConfiguration
+    private function generateSeatConfiguration(): SeatConfiguration
     {
-        $deckType = fake()->boolean(20) ? '2' : '1'; // 20% chance of double deck
-        $seatType = fake()->randomElement(['1', '2']); // 1 = seat, 2 = sleeper
+        $deckType = fake()->boolean(20) ? '2' : '1';
+        // 20% chance of double deck
+        $seatType = fake()->randomElement(['1', '2']);
+        // 1 = seat, 2 = sleeper
         $columnLabel = fake()->randomElement(['alpha', 'numeric']);
         $rowLabel = fake()->randomElement(['alpha', 'numeric']);
-
         // Valid layouts based on constraints (columns must be 2-4)
         $layouts = ['2:2', '1:2', '2:1'];
         $columnLayout = fake()->randomElement($layouts);
-
         // Calculate columns from layout (constrained to 2-4)
         $columns = $this->getColumnsFromLayout($columnLayout);
-        
-        // Calculate rows (constrained to 5-10) to approximate total seats
-        $targetRows = max(5, min(10, (int) ceil($totalSeats / $columns)));
-        $rows = fake()->numberBetween(5, 10); // Ensure we stay within constraints
-
+        $rows = fake()->numberBetween(5, 10);
+        // Ensure we stay within constraints
         // Base price varies by seat type
         $basePrice = $seatType === '2' ?
             fake()->numberBetween(80000, 150000) : // Sleeper: $800-$1500
-            fake()->numberBetween(30000, 80000);   // Regular: $300-$800
-
+            fake()->numberBetween(30000, 80000);
+        // Regular: $300-$800
         $lowerDeck = new SeatDeck(
             seatType: $seatType,
             totalColumns: $columns,
@@ -96,7 +93,6 @@ class BusFactory extends Factory
             rowLabel: $rowLabel,
             pricePerSeatInCents: $basePrice,
         );
-
         $upperDeck = null;
         if ($deckType === '2') {
             // Upper deck typically has fewer seats and may be more expensive

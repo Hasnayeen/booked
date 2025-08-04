@@ -23,46 +23,30 @@ class SeatDeck
     private function validate(): void
     {
         // Validate seat type
-        if (! in_array($this->seatType, ['1', '2'])) {
-            throw new InvalidArgumentException('Seat type must be "1" (seat) or "2" (sleeper)');
-        }
+        throw_unless(in_array($this->seatType, ['1', '2']), new InvalidArgumentException('Seat type must be "1" (seat) or "2" (sleeper)'));
 
         // Validate columns constraints
-        if ($this->totalColumns < 2 || $this->totalColumns > 4) {
-            throw new InvalidArgumentException('Total columns must be between 2 and 4');
-        }
+        throw_if($this->totalColumns < 2 || $this->totalColumns > 4, new InvalidArgumentException('Total columns must be between 2 and 4'));
 
         // Validate rows constraints
-        if ($this->totalRows < 5 || $this->totalRows > 10) {
-            throw new InvalidArgumentException('Total rows must be between 5 and 10');
-        }
+        throw_if($this->totalRows < 5 || $this->totalRows > 10, new InvalidArgumentException('Total rows must be between 5 and 10'));
 
         // Validate column label
-        if (! in_array($this->columnLabel, ['alpha', 'numeric'])) {
-            throw new InvalidArgumentException('Column label must be "alpha" or "numeric"');
-        }
+        throw_unless(in_array($this->columnLabel, ['alpha', 'numeric']), new InvalidArgumentException('Column label must be "alpha" or "numeric"'));
 
         // Validate row label
-        if (! in_array($this->rowLabel, ['alpha', 'numeric'])) {
-            throw new InvalidArgumentException('Row label must be "alpha" or "numeric"');
-        }
+        throw_unless(in_array($this->rowLabel, ['alpha', 'numeric']), new InvalidArgumentException('Row label must be "alpha" or "numeric"'));
 
         // Validate column layout
-        if (! preg_match('/^\d+:\d+$/', $this->columnLayout)) {
-            throw new InvalidArgumentException('Column layout must be in format "x:y" (e.g., "2:2")');
-        }
+        throw_unless(preg_match('/^\d+:\d+$/', $this->columnLayout), new InvalidArgumentException('Column layout must be in format "x:y" (e.g., "2:2")'));
 
         // Validate column layout matches total columns
         $layoutParts = explode(':', $this->columnLayout);
         $layoutTotal = (int) $layoutParts[0] + (int) $layoutParts[1];
-        if ($layoutTotal !== $this->totalColumns) {
-            throw new InvalidArgumentException("Column layout ({$this->columnLayout}) must sum to total columns ({$this->totalColumns})");
-        }
+        throw_if($layoutTotal !== $this->totalColumns, new InvalidArgumentException("Column layout ({$this->columnLayout}) must sum to total columns ({$this->totalColumns})"));
 
         // Validate price
-        if ($this->pricePerSeatInCents < 0) {
-            throw new InvalidArgumentException('Price per seat must be non-negative');
-        }
+        throw_if($this->pricePerSeatInCents < 0, new InvalidArgumentException('Price per seat must be non-negative'));
     }
 
     public static function fromArray(array $data): self

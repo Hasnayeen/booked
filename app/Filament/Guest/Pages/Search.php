@@ -71,22 +71,20 @@ class Search extends Page
     public function content(Schema $schema): Schema
     {
         $schema = parent::content($schema);
-        
+
         // Query RouteSchedules instead of Routes to get timing information
         $routes = Route::query()
             ->where('origin_city', $this->from)
             ->where('destination_city', $this->to)
-            ->with(['schedules' => function ($query) {
+            ->with(['schedules' => function ($query): void {
                 // Only get active schedules, optionally filter by date if needed
-                $query->whereHas('route', function ($q) {
+                $query->whereHas('route', function ($q): void {
                     $q->where('is_active', true);
                 });
             }, 'operator'])
             ->get()
-            ->filter(function ($route) {
-                return $route->schedules->isNotEmpty();
-            });
-            
+            ->filter(fn ($route) => $route->schedules->isNotEmpty());
+
         $this->results = $routes->values(); // Re-index after filtering
 
         return $schema

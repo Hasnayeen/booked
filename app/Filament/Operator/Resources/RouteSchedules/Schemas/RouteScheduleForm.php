@@ -32,20 +32,16 @@ class RouteScheduleForm
                             ->collapsible()
                             ->schema([
                                 Select::make('route_id')
-                                    ->relationship('route', 'route_name', function ($query) {
-                                        return $query->where('operator_id', filament()->getTenant()->id)
-                                                   ->where('is_active', true);
-                                    })
+                                    ->relationship('route', 'route_name', fn ($query) => $query->where('operator_id', filament()->getTenant()->id)
+                                        ->where('is_active', true))
                                     ->required()
                                     ->searchable()
                                     ->preload()
                                     ->helperText('Select the route for this schedule'),
 
                                 Select::make('bus_id')
-                                    ->relationship('bus', 'bus_number', function ($query) {
-                                        return $query->where('operator_id', filament()->getTenant()->id)
-                                                   ->where('is_active', true);
-                                    })
+                                    ->relationship('bus', 'bus_number', fn ($query) => $query->where('operator_id', filament()->getTenant()->id)
+                                        ->where('is_active', true))
                                     ->required()
                                     ->searchable()
                                     ->preload()

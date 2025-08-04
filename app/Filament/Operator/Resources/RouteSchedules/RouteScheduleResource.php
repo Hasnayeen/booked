@@ -14,7 +14,6 @@ use BackedEnum;
 use CodeWithDennis\FilamentLucideIcons\Enums\LucideIcon;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -69,7 +68,7 @@ class RouteScheduleResource extends Resource
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
         return parent::getRecordRouteBindingEloquentQuery()
-            ->whereHas('route', function (Builder $query) {
+            ->whereHas('route', function (Builder $query): void {
                 $query->where('operator_id', filament()->getTenant()->id);
             })
             ->withoutGlobalScopes([

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Filament\Operator\Resources\UserResource\Pages\EditUser;
 use App\Filament\Operator\Resources\UserResource\Pages\ListUsers;
 use App\Filament\Operator\Resources\UserResource\Pages\ViewUser;

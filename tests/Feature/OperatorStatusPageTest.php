@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\OperatorStatus;
 use App\Filament\Operator\Pages\Tenancy\OperatorStatusPage;
 use App\Models\Operator;

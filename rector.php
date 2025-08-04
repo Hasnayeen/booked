@@ -15,6 +15,7 @@ use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRect
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedPropertyRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector;
+use Rector\TypeDeclaration\Rector\StmtsAwareInterface\DeclareStrictTypesRector;
 use RectorLaravel\Set\LaravelLevelSetList;
 use RectorLaravel\Set\LaravelSetList;
 
@@ -63,6 +64,7 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->rule(ReturnTypeFromStrictTypedCallRector::class);
     $rectorConfig->rule(ReturnTypeFromStrictTypedPropertyRector::class);
     $rectorConfig->rule(TypedPropertyFromStrictConstructorRector::class);
+    $rectorConfig->rule(DeclareStrictTypesRector::class);
 
     $rectorConfig->parallel();
 

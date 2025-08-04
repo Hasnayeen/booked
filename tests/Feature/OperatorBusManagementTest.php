@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\BusCategory;
 use App\Enums\BusType;
 use App\Filament\Operator\Resources\Buses\BusResource;

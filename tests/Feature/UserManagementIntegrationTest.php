@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Filament\Operator\Resources\UserResource;
 use App\Models\Operator;
 use App\Models\Role;

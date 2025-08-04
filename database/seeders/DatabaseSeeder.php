@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Operator;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
@@ -44,24 +43,20 @@ class DatabaseSeeder extends Seeder
         $userRole = Role::where('name', 'User')->first();
         $regularUser->roles()->attach($userRole->id);
 
-        // Create an user with an operator
-        $operatorRole = Role::where('name', 'Operator Admin')->first();
-        $operatorUser = User::factory()->create([
-            'name' => 'Operator User',
-            'email' => 'operator@example.com',
-        ]);
-        $operator = Operator::factory()->create();
-        $operatorUser->operators()->attach($operator->id, ['role_id' => $operatorRole->id]);
-
+        // Create comprehensive data using separate seeders
         $this->call([
+            BusOperatorSeeder::class,
+            HotelOperatorSeeder::class,
+            RouteSeeder::class,
             BusSeeder::class,
-            BookingSeeder::class,
+            RouteScheduleSeeder::class,
         ]);
 
         $this->command->info('Database seeded successfully!');
         $this->command->info('Admin user: admin@example.com');
         $this->command->info('Regular user: user@example.com');
-        $this->command->info('Operator user: operator@example.com');
+        $this->command->info('Bus operator users: bus_operator_1@example.com to bus_operator_20@example.com');
+        $this->command->info('Hotel operator users: hotel_operator_1@example.com to hotel_operator_100@example.com');
         $this->command->info('Default password: password');
     }
 }

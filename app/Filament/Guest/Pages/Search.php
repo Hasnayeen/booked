@@ -4,8 +4,8 @@ namespace App\Filament\Guest\Pages;
 
 use App\Enums\BusCategory;
 use App\Enums\BusType;
-use App\Models\Operator;
 use App\Models\Route;
+use App\Models\RouteSchedule;
 use CodeWithDennis\FilamentLucideIcons\Enums\LucideIcon;
 use Filament\Actions\Action;
 use Filament\Forms\Components\CheckboxList;
@@ -72,20 +72,18 @@ class Search extends Page
     {
         $schema = parent::content($schema);
 
-        // Query RouteSchedules instead of Routes to get timing information
-        $routes = Route::query()
-            ->where('origin_city', $this->from)
-            ->where('destination_city', $this->to)
-            ->with(['schedules' => function ($query): void {
-                // Only get active schedules, optionally filter by date if needed
-                $query->whereHas('route', function ($q): void {
-                    $q->where('is_active', true);
-                });
-            }, 'operator'])
-            ->get()
-            ->filter(fn ($route) => $route->schedules->isNotEmpty());
+        // Query RouteSchedules with route relationship constraints for origin and destination cities
+        $schedules = RouteSchedule::query()
+            ->where('is_active', true)
+            ->whereHas('route', function ($query): void {
+                $query->where('origin_city', $this->from)
+                    ->where('destination_city', $this->to)
+                    ->where('is_active', true);
+            })
+            ->with(['route', 'bus', 'operator'])
+            ->get();
 
-        $this->results = $routes->values(); // Re-index after filtering
+        $this->results = $schedules;
 
         return $schema
             ->record($this->results->all())
@@ -214,7 +212,13 @@ class Search extends Page
                                     ->columnSpanFull(),
                             ]),
                         CheckboxList::make('operators')
-                            ->options($this->results->pluck('operator')->unique('id')->mapWithKeys(fn (Operator $operator) => [$operator->id => $operator->name])->toArray())
+                            ->options(
+                                $this->results
+                                    ->pluck('operator')
+                                    ->unique('id')
+                                    ->pluck('name', 'id')
+                                    ->toArray(),
+                            )
                             ->columnSpanFull(),
                     ]),
             ]);
@@ -243,49 +247,49 @@ class Search extends Page
                     ->schema([
                         Section::make()
                             ->collapsible()
-                            ->icon(fn (Route $record): string => $record->operator->logo ? 'logo-' . $record->operator->logo : 'lucide-triangle-alert')
+                            ->icon(fn (RouteSchedule $record): string => $record->operator->logo ? 'logo-' . $record->operator->logo : 'lucide-triangle-alert')
                             ->iconSize('lg')
-                            ->heading(fn (Route $record) => $record->operator->name)
-                            ->description(fn (Route $record): string => $record->schedules->first()?->departure_time?->format('h:i A') . ' - ' . $record->schedules->first()?->arrival_time?->format('h:i A'))
+                            ->heading(fn (RouteSchedule $record) => $record->operator->name)
+                            ->description(fn (RouteSchedule $record): string => $record->departure_time?->format('h:i A') . ' - ' . $record->arrival_time?->format('h:i A'))
                             ->afterHeader([
-                                TextEntry::make('schedules.0.bus.category')
+                                TextEntry::make('bus.category')
                                     ->hiddenLabel()
                                     ->badge()
-                                    ->color(fn (Route $record) => $record->schedules->first()?->bus?->category?->getColor() ?? 'gray'),
-                                TextEntry::make('schedules.0.bus.type')
+                                    ->color(fn (RouteSchedule $record) => $record->bus?->category?->getColor() ?? 'gray'),
+                                TextEntry::make('bus.type')
                                     ->hiddenLabel()
                                     ->badge()
-                                    ->color(fn (Route $record) => $record->schedules->first()?->bus?->type?->getColor() ?? 'gray'),
+                                    ->color(fn (RouteSchedule $record) => $record->bus?->type?->getColor() ?? 'gray'),
                             ])
                             ->schema([
-                                TextEntry::make('schedules.0.bus.bus_number')
+                                TextEntry::make('bus.bus_number')
                                     ->hiddenLabel()
                                     ->label('Bus Number')
                                     ->size('lg')
                                     ->weight('bold'),
                                 Flex::make([
-                                    TextEntry::make('origin_city')
+                                    TextEntry::make('route.origin_city')
                                         ->hiddenLabel()
                                         ->icon(LucideIcon::MapPin)
                                         ->size('lg')
                                         ->grow(false),
                                     View::make('filament.schemas.components.route-duration'),
-                                    TextEntry::make('destination_city')
+                                    TextEntry::make('route.destination_city')
                                         ->hiddenLabel()
                                         ->icon(LucideIcon::MapPin)
                                         ->size('lg')
                                         ->grow(false),
                                 ])->columnSpanFull(),
                                 Flex::make([
-                                    TextEntry::make('schedules.0.departure_time')
+                                    TextEntry::make('departure_time')
                                         ->hiddenLabel()
                                         ->dateTime('h:i A, d M'),
-                                    TextEntry::make('schedules.0.arrival_time')
+                                    TextEntry::make('arrival_time')
                                         ->hiddenLabel()
                                         ->dateTime('h:i A, d M')
                                         ->grow(false),
                                 ])->columnSpanFull(),
-                                TextEntry::make('schedules.0.bus.seats_available')
+                                TextEntry::make('bus.seats_available')
                                     ->hiddenLabel()
                                     ->label('Seats Available')
                                     ->color('success'),
@@ -293,23 +297,23 @@ class Search extends Page
                             ->footer([
                                 Flex::make([
                                     Flex::make([
-                                        TextEntry::make('schedules.0.bus.all_prices')
+                                        TextEntry::make('bus.all_prices')
                                             ->hiddenLabel()
                                             ->color('primary')
                                             ->size('lg')
                                             ->weight('bold')
-                                            ->state(fn ($record): array => array_map(fn ($price) => $price * $this->passengers, $record->schedules->first()?->bus?->all_prices ?? []))
+                                            ->state(fn ($record): array => array_map(fn ($price) => $price * $this->passengers, $record->bus?->all_prices ?? []))
                                             ->money('USD', 100)
                                             ->listWithLineBreaks()
                                             ->grow(false),
-                                        TextEntry::make('schedules.0.bus.all_prices')
+                                        TextEntry::make('bus.all_prices')
                                             ->hiddenLabel()
                                             ->size('md')
                                             ->money('USD', 100)
                                             ->listWithLineBreaks()
                                             ->extraAttributes(['class' => 'text-gray-600 [&_li]:text-gray-600'])
                                             ->grow(false),
-                                        TextEntry::make('schedules.0.bus.all_prices')
+                                        TextEntry::make('bus.all_prices')
                                             ->hiddenLabel()
                                             ->size('sm')
                                             ->extraAttributes(['class' => 'text-gray-600'])

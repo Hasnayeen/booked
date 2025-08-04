@@ -29,7 +29,7 @@ class RouteSchedulesTable
                     ->label('Bus')
                     ->searchable()
                     ->sortable()
-                    ->description(fn ($record): string => $record->bus->category . ' • ' . $record->bus->type),
+                    ->description(fn ($record): string => $record->bus->category->value . ' • ' . $record->bus->type->value),
 
                 TextColumn::make('departure_time')
                     ->label('Departure')
@@ -46,30 +46,10 @@ class RouteSchedulesTable
                     ->getStateUsing(fn ($record) => $record->estimated_duration)
                     ->placeholder('—'),
 
-                TextColumn::make('base_fare')
-                    ->label('Base Fare')
-                    ->money('USD', divideBy: 100)
-                    ->sortable(),
-
                 IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean()
                     ->sortable(),
-
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 TrashedFilter::make(),

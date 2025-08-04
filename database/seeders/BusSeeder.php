@@ -6,80 +6,100 @@ use App\Enums\BusCategory;
 use App\Enums\BusType;
 use App\Models\Bus;
 use App\Models\Operator;
+use App\Models\Route;
 use Illuminate\Database\Seeder;
+
+use function Laravel\Prompts\progress;
 
 class BusSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $operator = Operator::first();
+        $routes = Route::with('operator')->get();
 
-        if (! $operator) {
-            $this->command->warn('No operator found. Please run the main DatabaseSeeder first.');
+        if ($routes->isEmpty()) {
+            $this->command->error('No routes found. Please run RouteSeeder first.');
 
             return;
         }
 
-        $busCounter = 1;
+        // Calculate total buses needed (2-8 per route)
+        $totalBuses = 0;
+        $routeBusNeeds = [];
 
-        // Create buses for each combination of category and type
-        foreach (BusCategory::cases() as $category) {
-            // Determine which types to create based on category
-            $typesToCreate = match ($category) {
-                BusCategory::Economy => BusType::cases(), // Both AC and Non-AC
-                BusCategory::Business,
-                BusCategory::Luxury,
-                BusCategory::Sleeper => [BusType::Ac], // Only AC
-            };
-
-            foreach ($typesToCreate as $type) {
-                // Create 2 buses for each combination
-                for ($i = 1; $i <= 2; $i++) {
-                    $busNumber = sprintf('BUS-%03d', $busCounter);
-                    $licensePrefix = $this->getLicensePlatePrefix($category, $type);
-                    $licensePlate = sprintf('%s-%04d', $licensePrefix, $busCounter);
-
-                    // Use factory with appropriate state for category
-                    $factory = Bus::factory()->forOperator($operator);
-
-                    $factory = match ($category) {
-                        BusCategory::Luxury => $factory->luxury(),
-                        BusCategory::Sleeper => $factory->sleeper(),
-                        BusCategory::Economy, BusCategory::Business => $factory->standard(),
-                    };
-
-                    $factory->create([
-                        'bus_number' => $busNumber,
-                        'category' => $category,
-                        'type' => $type,
-                        'license_plate' => $licensePlate,
-                        'is_active' => true,
-                        'amenities' => $this->getAmenitiesForCategoryAndType($category, $type),
-                        'metadata' => [
-                            'year' => fake()->numberBetween(2018, 2024),
-                            'manufacturer' => fake()->randomElement(['Volvo', 'Mercedes-Benz', 'Scania', 'Tata', 'Ashok Leyland']),
-                            'fuel_type' => fake()->randomElement(['Diesel', 'CNG', 'Electric']),
-                            'seating_layout' => $this->getSeatingLayout($category),
-                        ],
-                    ]);
-
-                    $busCounter++;
-                }
-            }
+        foreach ($routes as $route) {
+            $busCount = fake()->numberBetween(2, 8);
+            $routeBusNeeds[$route->id] = $busCount;
+            $totalBuses += $busCount;
         }
 
-        $this->command->info('Created ' . ($busCounter - 1) . ' buses for operator: ' . $operator->name);
+        progress(
+            label: 'Creating buses for routes',
+            steps: $totalBuses,
+            callback: function () use ($routes, $routeBusNeeds) {
+                static $currentRouteIndex = 0;
+                static $busesCreatedForCurrentRoute = 0;
+
+                if ($currentRouteIndex >= $routes->count()) {
+                    return;
+                }
+
+                $route = $routes[$currentRouteIndex];
+                $busesNeeded = $routeBusNeeds[$route->id];
+
+                $bus = $this->createBusForOperator($route->operator);
+
+                $busesCreatedForCurrentRoute++;
+
+                if ($busesCreatedForCurrentRoute >= $busesNeeded) {
+                    $currentRouteIndex++;
+                    $busesCreatedForCurrentRoute = 0;
+                }
+
+                return "Created bus {$bus->bus_number} for {$route->operator->name}";
+            },
+        );
+
+        $this->command->info('✅ Buses created successfully!');
     }
 
-    /**
-     * Get amenities based on category and type.
-     */
-    private function getAmenitiesForCategoryAndType(BusCategory $category, BusType $type): array
+    private function createBusForOperator(Operator $operator): Bus
     {
-        $baseAmenities = ['GPS Tracking', 'First Aid Kit'];
+        $category = fake()->randomElement(BusCategory::cases());
+        $type = $category === BusCategory::Economy
+            ? fake()->randomElement(BusType::cases())
+            : BusType::Ac;
+
+        $totalSeats = match ($category) {
+            BusCategory::Economy => fake()->numberBetween(40, 55),
+            BusCategory::Business => fake()->numberBetween(32, 45),
+            BusCategory::Luxury => fake()->numberBetween(24, 36),
+            BusCategory::Sleeper => fake()->numberBetween(20, 32),
+        };
+
+        return Bus::create([
+            'operator_id' => $operator->id,
+            'bus_number' => 'BUS-' . fake()->unique()->numerify('####'),
+            'category' => $category,
+            'type' => $type,
+            'license_plate' => fake()->regexify('[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}'),
+            'total_seats' => $totalSeats,
+            'is_active' => true,
+            'amenities' => $this->getAmenitiesForCategory($category, $type),
+            'seat_config' => $this->generateSeatConfig($totalSeats),
+            'metadata' => [
+                'year' => fake()->numberBetween(2018, 2024),
+                'manufacturer' => fake()->randomElement(['Volvo', 'Mercedes-Benz', 'Scania', 'Tata', 'Ashok Leyland']),
+                'fuel_type' => fake()->randomElement(['Diesel', 'CNG', 'Electric']),
+                'insurance_expires' => fake()->dateTimeBetween('+6 months', '+2 years')->format('Y-m-d'),
+                'last_maintenance' => fake()->dateTimeBetween('-3 months', 'now')->format('Y-m-d'),
+            ],
+        ]);
+    }
+
+    private function getAmenitiesForCategory(BusCategory $category, BusType $type): array
+    {
+        $baseAmenities = ['GPS Tracking', 'First Aid Kit', 'Fire Extinguisher'];
 
         if ($type === BusType::Ac) {
             $baseAmenities[] = 'Air Conditioning';
@@ -87,44 +107,61 @@ class BusSeeder extends Seeder
 
         $categoryAmenities = match ($category) {
             BusCategory::Economy => ['Reading Lights', 'Mobile Charging Points'],
-            BusCategory::Business => ['WiFi', 'Reading Lights', 'Mobile Charging Points', 'Comfortable Seating'],
-            BusCategory::Luxury => ['WiFi', 'Entertainment System', 'Reclining Seats', 'Mobile Charging Points', 'Snack Service', 'Blankets'],
-            BusCategory::Sleeper => ['Bed Sheets', 'Pillows', 'Privacy Curtains', 'Mobile Charging Points', 'Reading Lights'],
+            BusCategory::Business => ['WiFi', 'Reading Lights', 'Mobile Charging Points', 'Comfortable Seating', 'Water Bottles'],
+            BusCategory::Luxury => ['WiFi', 'Entertainment System', 'Reclining Seats', 'Mobile Charging Points', 'Snack Service', 'Blankets', 'Pillows'],
+            BusCategory::Sleeper => ['Bed Sheets', 'Pillows', 'Privacy Curtains', 'Mobile Charging Points', 'Reading Lights', 'Individual AC Vents'],
         };
 
         return array_merge($baseAmenities, $categoryAmenities);
     }
 
-    /**
-     * Get license plate prefix based on category and type.
-     */
-    private function getLicensePlatePrefix(BusCategory $category, BusType $type): string
+    private function generateSeatConfig(int $totalSeats): array
     {
-        $categoryPrefix = match ($category) {
-            BusCategory::Economy => 'ECO',
-            BusCategory::Business => 'BIZ',
-            BusCategory::Luxury => 'LUX',
-            BusCategory::Sleeper => 'SLP',
-        };
+        // Determine if single or double deck based on seat count
+        $deckType = $totalSeats > 40 ? '2' : '1'; // Double deck for more than 40 seats
 
-        $typePrefix = match ($type) {
-            BusType::Ac => 'AC',
-            BusType::NonAc => 'NA',
-        };
+        if ($deckType === '1') {
+            // Single deck configuration
+            $totalRows = (int) ceil($totalSeats / 4);
+            $totalRows = max(5, min(10, $totalRows)); // Ensure between 5-10 rows
 
-        return $categoryPrefix . $typePrefix;
-    }
-
-    /**
-     * Get seating layout based on category.
-     */
-    private function getSeatingLayout(BusCategory $category): string
-    {
-        return match ($category) {
-            BusCategory::Economy => '2+2',
-            BusCategory::Business => '2+2',
-            BusCategory::Luxury => '2+1',
-            BusCategory::Sleeper => '2+1',
-        };
+            return [
+                'deck_type' => '1',
+                'lower_deck' => [
+                    'seat_type' => '1', // Regular seats
+                    'total_columns' => 4,
+                    'column_label' => 'alpha',
+                    'column_layout' => '2:2',
+                    'total_rows' => $totalRows,
+                    'row_label' => 'numeric',
+                    'price_per_seat_in_cents' => fake()->numberBetween(50000, 150000), // $500-$1500
+                ],
+            ];
+        }
+        // Double deck configuration
+        $rowsPerDeck = (int) ceil($totalSeats / 8);
+        // 4 seats per row per deck
+        $rowsPerDeck = max(5, min(10, $rowsPerDeck));
+        return [
+            'deck_type' => '2',
+            'lower_deck' => [
+                'seat_type' => '1',
+                'total_columns' => 4,
+                'column_label' => 'alpha',
+                'column_layout' => '2:2',
+                'total_rows' => $rowsPerDeck,
+                'row_label' => 'numeric',
+                'price_per_seat_in_cents' => fake()->numberBetween(60000, 180000),
+            ],
+            'upper_deck' => [
+                'seat_type' => '1',
+                'total_columns' => 4,
+                'column_label' => 'alpha',
+                'column_layout' => '2:2',
+                'total_rows' => $rowsPerDeck,
+                'row_label' => 'numeric',
+                'price_per_seat_in_cents' => fake()->numberBetween(60000, 180000),
+            ],
+        ];
     }
 }

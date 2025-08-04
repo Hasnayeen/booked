@@ -4,6 +4,8 @@ namespace App\Filament\Guest\Pages;
 
 use App\Enums\BusCategory;
 use App\Enums\BusType;
+use App\Enums\OperatorStatus;
+use App\Enums\OperatorType;
 use App\Models\Operator;
 use App\Models\Route;
 use CodeWithDennis\FilamentLucideIcons\Enums\LucideIcon;
@@ -18,6 +20,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Flex;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
@@ -30,6 +33,9 @@ class Search extends Page
     protected ?string $heading = '';
 
     protected static bool $shouldRegisterNavigation = false;
+
+    #[Url]
+    public string $search_type = 'bus';
 
     #[Url]
     public string $from = '';
@@ -52,6 +58,8 @@ class Search extends Page
     #[Url]
     public string $type = '';
 
+    public $results = [];
+
     public function mount(): void
     {
         $this->form->fill([
@@ -65,13 +73,14 @@ class Search extends Page
     public function content(Schema $schema): Schema
     {
         $schema = parent::content($schema);
-
-        return $schema
-            ->record(Route::query()
+        $this->results = Route::query()
                 ->where('origin_city', $this->from)
                 ->where('destination_city', $this->to)
                 ->orderBy('departure_time')
-                ->get()->all())
+                ->get();
+
+        return $schema
+            ->record($this->results->all())
             ->columns(12)
             ->components([
                 $this->getSearchFiltersComponents(),
@@ -82,31 +91,64 @@ class Search extends Page
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->columns(8)
             ->schema([
-                TextInput::make('from')
-                    ->columnSpan(2)
-                    ->required()
-                    ->placeholder('Enter departure location'),
-                TextInput::make('to')
-                    ->columnSpan(2)
-                    ->required()
-                    ->placeholder('Enter destination location'),
-                DatePicker::make('date')
-                    ->columnSpan(2)
-                    ->required()
-                    ->placeholder('Select travel date'),
-                Select::make('passengers')
-                    ->columnSpan(2)
-                    ->required()
-                    ->options([
-                        '1' => '1 Passenger',
-                        '2' => '2 Passengers',
-                        '3' => '3 Passengers',
-                        '4' => '4 Passengers',
-                        '5' => '5 Passengers',
-                    ])
-                    ->placeholder('Select number of passengers'),
+                Grid::make()
+                    ->columnSpanFull()
+                    ->columns(8)
+                    ->visible(fn () => $this->search_type === 'bus')
+                    ->schema([
+                        TextInput::make('from')
+                            ->columnSpan(2)
+                            ->datalist(Route::distinct('origin_city')->pluck('origin_city'))
+                            ->required()
+                            ->placeholder('Enter departure location'),
+                        TextInput::make('to')
+                            ->columnSpan(2)
+                            ->datalist(Route::distinct('destination_city')->pluck('destination_city'))
+                            ->required()
+                            ->placeholder('Enter destination location'),
+                        DatePicker::make('date')
+                            ->columnSpan(2)
+                            ->required()
+                            ->placeholder('Select travel date'),
+                        Select::make('passengers')
+                            ->columnSpan(2)
+                            ->required()
+                            ->options([
+                                '1' => '1 Passenger',
+                                '2' => '2 Passengers',
+                                '3' => '3 Passengers',
+                                '4' => '4 Passengers',
+                                '5' => '5 Passengers',
+                            ])
+                            ->placeholder('Select number of passengers'),
+                    ]),
+                Grid::make()
+                    ->columns(8)
+                    ->visible(fn () => $this->search_type === 'hotel')
+                    ->schema([
+                        TextInput::make('city')
+                            ->columnSpan(2)
+                            ->datalist(Route::distinct('destination_city')->pluck('destination_city'))
+                            ->required()
+                            ->placeholder('Enter city or area'),
+                        Select::make('guests')
+                            ->columnSpan(2)
+                            ->required()
+                            ->options(array_map(
+                                fn($i) => "$i Guest" . ($i > 1 ? 's' : ''),
+                                range(1, 10)
+                            ))
+                            ->placeholder('Select number of guests'),
+                        DatePicker::make('check_in')
+                            ->columnSpan(2)
+                            ->required()
+                            ->placeholder('Select check-in date'),
+                        DatePicker::make('check_out')
+                            ->columnSpan(2)
+                            ->required()
+                            ->placeholder('Select check-out date'),
+                    ]),
             ]);
     }
 
@@ -133,39 +175,40 @@ class Search extends Page
             ->description('Use the filters below to refine your search results.')
             ->extraAttributes(['class' => 'sticky top-20'])
             ->schema([
-                Select::make('category')
-                    ->label('Bus Category')
-                    ->options(collect(BusCategory::cases())->mapWithKeys(fn (BusCategory $category) => [$category->value => $category->getLabel()]))
-                    ->placeholder('Select a category')
-                    ->searchable()
-                    ->columnSpanFull(),
-                Select::make('type')
-                    ->label('Bus Type')
-                    ->options(collect(BusType::cases())->mapWithKeys(fn (BusType $type) => [$type->value => $type->getLabel()]))
-                    ->placeholder('Select a type')
-                    ->searchable()
-                    ->columnSpanFull(),
-                Section::make()
-                    ->columnSpanFull()
-                    ->description('Price range')
-                    ->contained(false)
+                Grid::make()
+                    ->visible(fn () => $this->search_type === 'bus')
                     ->schema([
-                        Slider::make('price_range')
-                            ->hiddenLabel()
-                            ->extraFieldWrapperAttributes(['class' => 'px-5'])
-                            ->range(500, 3000)
-                            ->step(50)
-                            ->decimalPlaces(0)
-                            ->default([500, 2000])
-                            ->tooltips()
+                        Select::make('category')
+                            ->label('Bus Category')
+                            ->options(collect(BusCategory::cases())->mapWithKeys(fn (BusCategory $category) => [$category->value => $category->getLabel()]))
+                            ->placeholder('Select a category')
+                            ->searchable()
                             ->columnSpanFull(),
-                    ]),
-                CheckboxList::make('operators')
-                    ->options(Operator::query()
-                        ->orderBy('name')
-                        ->get()
-                        ->pluck('name', 'id'))
-                    ->columnSpanFull(),
+                        Select::make('type')
+                            ->label('Bus Type')
+                            ->options(collect(BusType::cases())->mapWithKeys(fn (BusType $type) => [$type->value => $type->getLabel()]))
+                            ->placeholder('Select a type')
+                            ->searchable()
+                            ->columnSpanFull(),
+                        Section::make()
+                            ->columnSpanFull()
+                            ->description('Price range')
+                            ->contained(false)
+                            ->schema([
+                                Slider::make('price_range')
+                                    ->hiddenLabel()
+                                    ->extraFieldWrapperAttributes(['class' => 'px-5'])
+                                    ->range(500, 3000)
+                                    ->step(50)
+                                    ->decimalPlaces(0)
+                                    ->default([500, 2000])
+                                    ->tooltips()
+                                    ->columnSpanFull(),
+                            ]),
+                        CheckboxList::make('operators')
+                            ->options($this->results->pluck('operator')->unique('id')->mapWithKeys(fn (Operator $operator) => [$operator->id => $operator->name]))
+                            ->columnSpanFull(),
+                    ])
             ]);
     }
 
@@ -192,7 +235,7 @@ class Search extends Page
                     ->schema([
                         Section::make()
                             ->collapsible()
-                            ->icon(fn (Route $record): string => 'logo-' . $record->operator->logo)
+                            ->icon(fn (Route $record): string => $record->operator->logo ? 'logo-' . $record->operator->logo : 'lucide-triangle-alert')
                             ->iconSize('lg')
                             ->heading(fn (Route $record) => $record->operator->name)
                             ->description(fn (Route $record): string => $record->departure_time->format('h:i A') . ' - ' . $record->arrival_time->format('h:i A'))

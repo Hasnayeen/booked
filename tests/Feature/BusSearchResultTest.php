@@ -2,7 +2,7 @@
 
 use App\Enums\BusCategory;
 use App\Enums\BusType;
-use App\Filament\Home\Pages\Search;
+use App\Filament\Guest\Pages\Search;
 use App\Models\Bus;
 use App\Models\Operator;
 use App\Models\Route;
@@ -63,35 +63,107 @@ describe('Bus Search Results', function (): void {
             'departure_time' => now()->addDay()->setTime(10, 0),
             'arrival_time' => now()->addDay()->setTime(14, 0),
         ]);
+
+        filament()->setCurrentPanel('guest');            
     });
 
     describe('Search Form & Validation Tests', function (): void {
         it('can render search page successfully', function (): void {
-        })->todo();
+            livewire(Search::class)
+                ->assertSuccessful()
+                ->assertViewIs('filament.home.pages.search');
+        });
 
-        it('can display search form with all required fields', function (): void {
-        })->todo();
+        it('can display search fields with all required fields', function (): void {
+            livewire(Search::class)
+                ->assertSchemaStateSet([
+                    'search_type' => 'bus',
+                    'from' => '',
+                    'to' => '',
+                    'date' => '',
+                    'passengers' => '',
+                ]);
+        });
 
         it('can pre-fill form fields from URL parameters', function (): void {
-        })->todo();
+            $tomorrow = now()->addDay()->format('Y-m-d');
+            
+            livewire(Search::class, [
+                'from' => 'New York',
+                'to' => 'Boston', 
+                'date' => $tomorrow,
+                'passengers' => '2'
+            ])
+                ->assertSchemaStateSet([
+                    'from' => 'New York',
+                    'to' => 'Boston',
+                    'date' => $tomorrow,
+                    'passengers' => '2',
+                ]);
+        });
 
         it('can validate required fields when searching', function (): void {
-        })->todo();
+            livewire(Search::class)
+                ->fillForm([
+                    'from' => '',
+                    'to' => '',
+                    'date' => '',
+                    'passengers' => '',
+                ])
+                ->call('search')
+                ->assertHasFormErrors([
+                    'from' => 'required',
+                    'to' => 'required', 
+                    'date' => 'required',
+                    'passengers' => 'required',
+                ]);
+        });
 
         it('can show validation errors for invalid date format', function (): void {
         })->todo();
 
-        it('can show validation errors for invalid passenger count', function (): void {
-        })->todo();
-
-        it('can show validation errors for empty origin/destination', function (): void {
-        })->todo();
-
         it('can submit search form with valid data', function (): void {
-        })->todo();
+            $tomorrow = now()->addDay()->format('Y-m-d');
+            
+            livewire(Search::class)
+                ->fillForm([
+                    'from' => 'New York',
+                    'to' => 'Boston',
+                    'date' => $tomorrow,
+                    'passengers' => '2',
+                ])
+                ->call('search')
+                ->assertHasNoFormErrors()
+                ->assertSet('from', 'New York')
+                ->assertSet('to', 'Boston')
+                ->assertSet('date', $tomorrow)
+                ->assertSet('passengers', '2');
+        });
 
         it('can update URL parameters after successful search', function (): void {
-        })->todo();
+            $tomorrow = now()->addDay()->format('Y-m-d');
+            
+            $component = livewire(Search::class);
+            expect($component->get('from'))->toBe('');
+            expect($component->get('to'))->toBe('');
+            expect($component->get('date'))->toBe('');
+            expect($component->get('passengers'))->toBe('');
+
+            $component->fillForm([
+                'from' => 'New York',
+                'to' => 'Boston',
+                'date' => $tomorrow,
+                'passengers' => '3',
+            ])
+            ->call('search')
+            ->assertHasNoFormErrors();
+            
+            // Verify the URL properties have been updated
+            expect($component->get('from'))->toBe('New York');
+            expect($component->get('to'))->toBe('Boston');
+            expect($component->get('date'))->toBe($tomorrow);
+            expect($component->get('passengers'))->toBe('3');
+        });
 
         it('can persist search parameters across page interactions', function (): void {
         })->todo();

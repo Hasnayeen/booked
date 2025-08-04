@@ -14,6 +14,8 @@ class Route extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $appends = ['estimated_duration'];
+
     /**
      * Get the attributes that should be cast.
      */

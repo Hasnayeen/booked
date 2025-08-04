@@ -38,22 +38,22 @@ class Home extends Page
                             ->columns(2)
                             ->schema([
                                 TextInput::make('from')
-                                    ->required(fn () => $this->search_type === 'bus')
+                                    ->required(fn (): bool => $this->search_type === 'bus')
                                     ->datalist(Route::distinct('origin_city')->pluck('origin_city'))
                                     ->placeholder('Enter departure location'),
                                 TextInput::make('to')
-                                    ->required(fn () => $this->search_type === 'bus')
+                                    ->required(fn (): bool => $this->search_type === 'bus')
                                     ->datalist(Route::distinct('destination_city')->pluck('destination_city'))
                                     ->placeholder('Enter destination location'),
                                 DatePicker::make('date')
-                                    ->required(fn () => $this->search_type === 'bus')
+                                    ->required(fn (): bool => $this->search_type === 'bus')
                                     ->placeholder('Select travel date'),
                                 Select::make('passengers')
-                                    ->required(fn () => $this->search_type === 'bus')
+                                    ->required(fn (): bool => $this->search_type === 'bus')
                                     ->default('1')
                                     ->options(array_map(
-                                        fn($i) => "$i Passenger" . ($i > 1 ? 's' : ''),
-                                        range(1, 4)
+                                        fn ($i): string => "$i Passenger" . ($i > 1 ? 's' : ''),
+                                        range(1, 4),
                                     ))
                                     ->placeholder('Select number of passengers'),
                                 Grid::make()
@@ -64,28 +64,28 @@ class Home extends Page
                                             ->color('primary')
                                             ->extraAttributes(['class' => 'w-full'])
                                             ->action(fn () => $this->submit('bus')),
-                                    ])
+                                    ]),
                             ]),
                         Tab::make('Hotel')
                             ->columns(2)
                             ->schema([
                                 TextInput::make('city')
-                                    ->required(fn () => $this->search_type === 'hotel')
+                                    ->required(fn (): bool => $this->search_type === 'hotel')
                                     ->datalist(Route::distinct('destination_city')->pluck('destination_city'))
                                     ->placeholder('Enter city or area'),
                                 Select::make('guests')
-                                    ->required(fn () => $this->search_type === 'hotel')
+                                    ->required(fn (): bool => $this->search_type === 'hotel')
                                     ->default('1')
                                     ->options(array_map(
-                                        fn($i) => "$i Guest" . ($i > 1 ? 's' : ''),
-                                        range(1, 10)
+                                        fn ($i): string => "$i Guest" . ($i > 1 ? 's' : ''),
+                                        range(1, 10),
                                     ))
                                     ->placeholder('Select number of guests'),
                                 DatePicker::make('check_in')
-                                    ->required(fn () => $this->search_type === 'hotel')
+                                    ->required(fn (): bool => $this->search_type === 'hotel')
                                     ->placeholder('Select check-in date'),
                                 DatePicker::make('check_out')
-                                    ->required(fn () => $this->search_type === 'hotel')
+                                    ->required(fn (): bool => $this->search_type === 'hotel')
                                     ->placeholder('Select check-out date'),
                                 Grid::make()
                                     ->columnSpanFull()
@@ -95,14 +95,14 @@ class Home extends Page
                                             ->color('primary')
                                             ->extraAttributes(['class' => 'w-full'])
                                             ->action(fn () => $this->submit('hotel')),
-                                    ])
+                                    ]),
                             ]),
                     ]),
             ])
             ->statePath('data');
     }
 
-    public function submit($activeTab)
+    public function submit(string $activeTab)
     {
         $this->search_type = $activeTab;
         $this->validate();

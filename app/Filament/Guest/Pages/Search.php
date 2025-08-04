@@ -4,8 +4,6 @@ namespace App\Filament\Guest\Pages;
 
 use App\Enums\BusCategory;
 use App\Enums\BusType;
-use App\Enums\OperatorStatus;
-use App\Enums\OperatorType;
 use App\Models\Operator;
 use App\Models\Route;
 use CodeWithDennis\FilamentLucideIcons\Enums\LucideIcon;
@@ -74,10 +72,10 @@ class Search extends Page
     {
         $schema = parent::content($schema);
         $this->results = Route::query()
-                ->where('origin_city', $this->from)
-                ->where('destination_city', $this->to)
-                ->orderBy('departure_time')
-                ->get();
+            ->where('origin_city', $this->from)
+            ->where('destination_city', $this->to)
+            ->orderBy('departure_time')
+            ->get();
 
         return $schema
             ->record($this->results->all())
@@ -95,7 +93,7 @@ class Search extends Page
                 Grid::make()
                     ->columnSpanFull()
                     ->columns(8)
-                    ->visible(fn () => $this->search_type === 'bus')
+                    ->visible(fn (): bool => $this->search_type === 'bus')
                     ->schema([
                         TextInput::make('from')
                             ->columnSpan(2)
@@ -125,7 +123,7 @@ class Search extends Page
                     ]),
                 Grid::make()
                     ->columns(8)
-                    ->visible(fn () => $this->search_type === 'hotel')
+                    ->visible(fn (): bool => $this->search_type === 'hotel')
                     ->schema([
                         TextInput::make('city')
                             ->columnSpan(2)
@@ -136,8 +134,8 @@ class Search extends Page
                             ->columnSpan(2)
                             ->required()
                             ->options(array_map(
-                                fn($i) => "$i Guest" . ($i > 1 ? 's' : ''),
-                                range(1, 10)
+                                fn ($i): string => "$i Guest" . ($i > 1 ? 's' : ''),
+                                range(1, 10),
                             ))
                             ->placeholder('Select number of guests'),
                         DatePicker::make('check_in')
@@ -176,7 +174,7 @@ class Search extends Page
             ->extraAttributes(['class' => 'sticky top-20'])
             ->schema([
                 Grid::make()
-                    ->visible(fn () => $this->search_type === 'bus')
+                    ->visible(fn (): bool => $this->search_type === 'bus')
                     ->schema([
                         Select::make('category')
                             ->label('Bus Category')
@@ -208,7 +206,7 @@ class Search extends Page
                         CheckboxList::make('operators')
                             ->options($this->results->pluck('operator')->unique('id')->mapWithKeys(fn (Operator $operator) => [$operator->id => $operator->name]))
                             ->columnSpanFull(),
-                    ])
+                    ]),
             ]);
     }
 

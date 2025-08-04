@@ -64,7 +64,7 @@ describe('Bus Search Results', function (): void {
             'arrival_time' => now()->addDay()->setTime(14, 0),
         ]);
 
-        filament()->setCurrentPanel('guest');            
+        filament()->setCurrentPanel('guest');
     });
 
     describe('Search Form & Validation Tests', function (): void {
@@ -87,12 +87,12 @@ describe('Bus Search Results', function (): void {
 
         it('can pre-fill form fields from URL parameters', function (): void {
             $tomorrow = now()->addDay()->format('Y-m-d');
-            
+
             livewire(Search::class, [
                 'from' => 'New York',
-                'to' => 'Boston', 
+                'to' => 'Boston',
                 'date' => $tomorrow,
-                'passengers' => '2'
+                'passengers' => '2',
             ])
                 ->assertSchemaStateSet([
                     'from' => 'New York',
@@ -113,7 +113,7 @@ describe('Bus Search Results', function (): void {
                 ->call('search')
                 ->assertHasFormErrors([
                     'from' => 'required',
-                    'to' => 'required', 
+                    'to' => 'required',
                     'date' => 'required',
                     'passengers' => 'required',
                 ]);
@@ -123,7 +123,7 @@ describe('Bus Search Results', function (): void {
 
         it('can submit search form with valid data', function (): void {
             $tomorrow = now()->addDay()->format('Y-m-d');
-            
+
             livewire(Search::class)
                 ->fillForm([
                     'from' => 'New York',
@@ -141,7 +141,7 @@ describe('Bus Search Results', function (): void {
 
         it('can update URL parameters after successful search', function (): void {
             $tomorrow = now()->addDay()->format('Y-m-d');
-            
+
             $component = livewire(Search::class);
             expect($component->get('from'))->toBe('');
             expect($component->get('to'))->toBe('');
@@ -154,9 +154,9 @@ describe('Bus Search Results', function (): void {
                 'date' => $tomorrow,
                 'passengers' => '3',
             ])
-            ->call('search')
-            ->assertHasNoFormErrors();
-            
+                ->call('search')
+                ->assertHasNoFormErrors();
+
             // Verify the URL properties have been updated
             expect($component->get('from'))->toBe('New York');
             expect($component->get('to'))->toBe('Boston');

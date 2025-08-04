@@ -22,4 +22,11 @@ class EditRoute extends EditRecord
             RestoreAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        unset($data['estimated_duration']);
+
+        return $data;
+    }
 }

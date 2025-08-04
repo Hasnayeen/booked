@@ -8,6 +8,7 @@ use App\Filament\Guest\Pages\Search;
 use App\Models\Bus;
 use App\Models\Operator;
 use App\Models\Route;
+use App\Models\RouteSchedule;
 
 use function Pest\Livewire\livewire;
 
@@ -165,7 +166,7 @@ describe('Bus Search Results', function (): void {
             $tomorrow = now()->addDay()->format('Y-m-d');
 
             // Create route schedules for the matching routes
-            $schedule1 = \App\Models\RouteSchedule::factory()->create([
+            $schedule1 = RouteSchedule::factory()->create([
                 'operator_id' => $this->operator->id,
                 'route_id' => $this->matchingRoute->id,
                 'bus_id' => $this->economyBus->id,
@@ -174,7 +175,7 @@ describe('Bus Search Results', function (): void {
                 'is_active' => true,
             ]);
 
-            $schedule2 = \App\Models\RouteSchedule::factory()->create([
+            $schedule2 = RouteSchedule::factory()->create([
                 'operator_id' => $this->operator->id,
                 'route_id' => $this->anotherMatchingRoute->id,
                 'bus_id' => $this->luxuryBus->id,

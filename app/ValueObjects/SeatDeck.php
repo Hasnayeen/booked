@@ -150,7 +150,7 @@ class SeatDeck
     private function generateColumnLabels(): array
     {
         if ($this->columnLabel === 'numeric') {
-            return range(1, $this->totalColumns);
+            return array_map('strval', range(1, $this->totalColumns));
         }
 
         // Limit to 26 columns when using alphabetical labels
@@ -162,7 +162,7 @@ class SeatDeck
     private function generateRowLabels(): array
     {
         if ($this->rowLabel === 'numeric') {
-            return range(1, $this->totalRows);
+            return array_map('strval', range(1, $this->totalRows));
         }
 
         // Limit to 26 rows when using alphabetical labels

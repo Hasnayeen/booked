@@ -142,6 +142,7 @@ class BusSeeder extends Seeder
         $rowsPerDeck = (int) ceil($totalSeats / 8);
         // 4 seats per row per deck
         $rowsPerDeck = max(5, min(10, $rowsPerDeck));
+
         return [
             'deck_type' => '2',
             'lower_deck' => [

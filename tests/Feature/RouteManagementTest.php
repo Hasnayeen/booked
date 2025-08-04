@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Filament\Operator\Resources\Routes\Pages\CreateRoute;
 use App\Filament\Operator\Resources\Routes\Pages\ListRoutes;
 use App\Models\Bus;

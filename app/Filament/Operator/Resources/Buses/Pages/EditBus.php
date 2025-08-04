@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Operator\Resources\Buses\Pages;
 
 use App\Filament\Operator\Resources\Buses\BusResource;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Operator\Resources\Routes\Tables;
 
 use Filament\Actions\BulkActionGroup;

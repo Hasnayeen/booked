@@ -12,30 +12,57 @@ class RouteInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('operator.name')
-                    ->numeric(),
-                TextEntry::make('bus.id')
-                    ->numeric(),
-                TextEntry::make('route_name'),
-                TextEntry::make('origin_city'),
-                TextEntry::make('destination_city'),
-                TextEntry::make('departure_time')
-                    ->time(),
-                TextEntry::make('arrival_time')
-                    ->time(),
+                TextEntry::make('route_name')
+                    ->label('Route Name'),
+
+                TextEntry::make('origin_city')
+                    ->label('Origin City'),
+
+                TextEntry::make('destination_city')
+                    ->label('Destination City'),
+
                 TextEntry::make('distance_km')
+                    ->label('Distance')
+                    ->suffix(' km')
                     ->numeric(),
-                TextEntry::make('estimated_duration'),
-                TextEntry::make('base_price')
-                    ->numeric(),
+
+                TextEntry::make('schedules_count')
+                    ->label('Total Schedules')
+                    ->getStateUsing(fn ($record) => $record->schedules()->count()),
+
+                TextEntry::make('active_schedules_count')
+                    ->label('Active Schedules')
+                    ->getStateUsing(fn ($record) => $record->activeSchedules()->count()),
+
                 IconEntry::make('is_active')
-                    ->boolean(),
+                    ->boolean()
+                    ->label('Route Active'),
+
+                TextEntry::make('stops')
+                    ->label('Stops')
+                    ->listWithLineBreaks()
+                    ->getStateUsing(fn ($record) => collect($record->stops ?? [])->pluck('stop')->toArray())
+                    ->placeholder('No stops defined'),
+
+                TextEntry::make('boarding_points')
+                    ->label('Boarding Points')
+                    ->listWithLineBreaks()
+                    ->getStateUsing(fn ($record) => collect($record->boarding_points ?? [])->pluck('point')->toArray())
+                    ->placeholder('No boarding points defined'),
+
+                TextEntry::make('drop_off_points')
+                    ->label('Drop-off Points')
+                    ->listWithLineBreaks()
+                    ->getStateUsing(fn ($record) => collect($record->drop_off_points ?? [])->pluck('point')->toArray())
+                    ->placeholder('No drop-off points defined'),
+
                 TextEntry::make('created_at')
-                    ->dateTime(),
+                    ->dateTime()
+                    ->label('Created'),
+
                 TextEntry::make('updated_at')
-                    ->dateTime(),
-                TextEntry::make('deleted_at')
-                    ->dateTime(),
+                    ->dateTime()
+                    ->label('Last Updated'),
             ]);
     }
 }

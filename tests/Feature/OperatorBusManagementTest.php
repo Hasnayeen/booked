@@ -235,12 +235,27 @@ describe('Operator Bus Management', function (): void {
 
     describe('Bus Editing', function (): void {
         it('can edit bus through filament admin panel', function (): void {
+            // Base data for all buses
             $updatedData = [
                 'total_columns' => 4,
-                'total_rows' => 10,
+                'total_rows' => 10,  
                 'price_per_seat' => 1500,
                 'is_active' => false,
             ];
+
+            // If the bus has a double deck configuration, add upper deck fields
+            if ($this->bus->seat_config?->deckType === '2') {
+                $updatedData = array_merge($updatedData, [
+                    'deck' => '2',
+                    'total_columns_upper' => 4,
+                    'total_rows_upper' => 8,
+                    'price_per_seat_upper' => 1800,
+                ]);
+                $expectedTotalSeats = 40 + 32; // lower deck (4x10) + upper deck (4x8)
+            } else {
+                $updatedData['deck'] = '1';
+                $expectedTotalSeats = 40; // lower deck only (4x10)
+            }
 
             livewire(EditBus::class, ['record' => $this->bus->getRouteKey()])
                 ->fillForm($updatedData)
@@ -249,7 +264,7 @@ describe('Operator Bus Management', function (): void {
                 ->assertNotified();
 
             $this->bus->refresh();
-            expect($this->bus->total_seats)->toBe(40);
+            expect($this->bus->total_seats)->toBe($expectedTotalSeats);
             expect($this->bus->is_active)->toBeFalse();
         });
 

@@ -3,6 +3,7 @@
 namespace App\ValueObjects;
 
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 
 class SeatDeck
 {
@@ -15,7 +16,54 @@ class SeatDeck
         public readonly string $rowLabel, // 'alpha' or 'numeric'
         public readonly int $pricePerSeatInCents,
         private readonly ?Collection $seats = null,
-    ) {}
+    ) {
+        $this->validate();
+    }
+
+    private function validate(): void
+    {
+        // Validate seat type
+        if (! in_array($this->seatType, ['1', '2'])) {
+            throw new InvalidArgumentException('Seat type must be "1" (seat) or "2" (sleeper)');
+        }
+
+        // Validate columns constraints
+        if ($this->totalColumns < 2 || $this->totalColumns > 4) {
+            throw new InvalidArgumentException('Total columns must be between 2 and 4');
+        }
+
+        // Validate rows constraints
+        if ($this->totalRows < 5 || $this->totalRows > 10) {
+            throw new InvalidArgumentException('Total rows must be between 5 and 10');
+        }
+
+        // Validate column label
+        if (! in_array($this->columnLabel, ['alpha', 'numeric'])) {
+            throw new InvalidArgumentException('Column label must be "alpha" or "numeric"');
+        }
+
+        // Validate row label
+        if (! in_array($this->rowLabel, ['alpha', 'numeric'])) {
+            throw new InvalidArgumentException('Row label must be "alpha" or "numeric"');
+        }
+
+        // Validate column layout
+        if (! preg_match('/^\d+:\d+$/', $this->columnLayout)) {
+            throw new InvalidArgumentException('Column layout must be in format "x:y" (e.g., "2:2")');
+        }
+
+        // Validate column layout matches total columns
+        $layoutParts = explode(':', $this->columnLayout);
+        $layoutTotal = (int) $layoutParts[0] + (int) $layoutParts[1];
+        if ($layoutTotal !== $this->totalColumns) {
+            throw new InvalidArgumentException("Column layout ({$this->columnLayout}) must sum to total columns ({$this->totalColumns})");
+        }
+
+        // Validate price
+        if ($this->pricePerSeatInCents < 0) {
+            throw new InvalidArgumentException('Price per seat must be non-negative');
+        }
+    }
 
     public static function fromArray(array $data): self
     {

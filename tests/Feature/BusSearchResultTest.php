@@ -36,32 +36,23 @@ describe('Bus Search Results', function (): void {
             'total_seats' => 35,
         ]);
 
-        // Create routes for testing
+        // Create routes for testing (without schedule data - that goes to RouteSchedule)
         $this->matchingRoute = Route::factory()->create([
-            'bus_id' => $this->economyBus->id,
             'operator_id' => $this->operator->id,
             'origin_city' => 'New York',
             'destination_city' => 'Boston',
-            'departure_time' => now()->addDay()->setTime(9, 0),
-            'arrival_time' => now()->addDay()->setTime(13, 0),
         ]);
 
         $this->anotherMatchingRoute = Route::factory()->create([
-            'bus_id' => $this->luxuryBus->id,
             'operator_id' => $this->operator->id,
             'origin_city' => 'New York',
             'destination_city' => 'Boston',
-            'departure_time' => now()->addDay()->setTime(11, 0),
-            'arrival_time' => now()->addDay()->setTime(15, 0),
         ]);
 
         $this->nonMatchingRoute = Route::factory()->create([
-            'bus_id' => $this->anotherOperatorBus->id,
             'operator_id' => $this->anotherOperator->id,
             'origin_city' => 'Chicago',
             'destination_city' => 'Detroit',
-            'departure_time' => now()->addDay()->setTime(10, 0),
-            'arrival_time' => now()->addDay()->setTime(14, 0),
         ]);
 
         filament()->setCurrentPanel('guest');

@@ -39,10 +39,26 @@ class BusBooking extends Model
     }
 
     /**
-     * Get the route associated with this booking.
+     * Get the route schedule associated with this booking.
+     */
+    public function routeSchedule(): BelongsTo
+    {
+        return $this->belongsTo(RouteSchedule::class);
+    }
+
+    /**
+     * Get the route through the schedule.
      */
     public function route(): BelongsTo
     {
-        return $this->belongsTo(Route::class);
+        return $this->routeSchedule->route();
+    }
+
+    /**
+     * Get the bus through the schedule.
+     */
+    public function bus(): BelongsTo
+    {
+        return $this->routeSchedule->bus();
     }
 }

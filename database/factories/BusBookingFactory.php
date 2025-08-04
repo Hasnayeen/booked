@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Booking;
 use App\Models\BusBooking;
-use App\Models\Route;
+use App\Models\RouteSchedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -35,7 +35,7 @@ class BusBookingFactory extends Factory
 
         return [
             'booking_id' => Booking::factory(),
-            'route_id' => Route::factory(),
+            'route_schedule_id' => RouteSchedule::factory(),
             'travel_date' => fake()->dateTimeBetween('now', '+60 days'),
             'seat_numbers' => $seatNumbers,
             'passenger_count' => $passengerCount,

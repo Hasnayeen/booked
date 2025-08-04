@@ -2,10 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\Bus;
 use App\Models\Operator;
 use App\Models\Route;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,33 +15,16 @@ class RouteFactory extends Factory
 
     public function definition(): array
     {
-        $departureTime = fake()->time('H:i');
-        $arrivalTime = fake()->time('H:i');
-
-        // Ensure arrival is after departure (simple same-day calculation)
-        $departure = Carbon::createFromFormat('H:i', $departureTime);
-        $arrival = Carbon::createFromFormat('H:i', $arrivalTime);
-
-        if ($arrival->lessThanOrEqualTo($departure)) {
-            $arrival = $departure->copy()->addHours(random_int(1, 8));
-        }
-
-        $arrival->diff($departure);
-
         $originCity = fake()->city();
         $destinationCity = fake()->city();
 
         return [
             'operator_id' => Operator::factory(),
-            'bus_id' => Bus::factory(),
             'route_name' => $originCity . ' to ' . $destinationCity,
             'origin_city' => $originCity,
             'destination_city' => $destinationCity,
-            'departure_time' => $departureTime,
-            'arrival_time' => $arrival->format('H:i'),
             'distance_km' => fake()->randomFloat(1, 50, 800),
             'is_active' => fake()->boolean(85),
-            'off_days' => fake()->randomElements(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'], random_int(0, 2)),
             'stops' => fake()->randomElements([
                 ['stop' => 'Central Station'],
                 ['stop' => 'Airport Terminal'],
@@ -83,18 +64,5 @@ class RouteFactory extends Factory
         return $this->state(fn (array $attributes): array => [
             'is_active' => false,
         ]);
-    }
-
-    public function overnight(): static
-    {
-        return $this->state(function (array $attributes): array {
-            $departureTime = '23:30';
-            $arrivalTime = '06:15';
-
-            return [
-                'departure_time' => $departureTime,
-                'arrival_time' => $arrivalTime,
-            ];
-        });
     }
 }

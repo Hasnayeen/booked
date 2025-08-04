@@ -9,6 +9,7 @@ use App\Models\HotelBooking;
 use App\Models\Operator;
 use App\Models\Room;
 use App\Models\Route;
+use App\Models\RouteSchedule;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -59,7 +60,7 @@ class BookingSeeder extends Seeder
         $this->createHotelBookings($hotelOperators, $users, $rooms);
 
         // Create bus bookings
-        $this->createBusBookings($busOperators, $users, $routes);
+        $this->createBusBookings($busOperators, $users);
 
         $this->command->info('Bookings seeded successfully!');
         $this->command->info('Total bookings created: ' . Booking::count());
@@ -97,7 +98,39 @@ class BookingSeeder extends Seeder
 
             if ($routeCount < 3) {
                 $this->command->info("Creating routes for bus operator: {$operator->name}");
-                Route::factory()->count(5)->for($operator)->create();
+                $routes = Route::factory()->count(5)->for($operator)->create();
+                
+                // Create schedules for each route
+                $this->createSchedulesForRoutes($routes, $operator);
+            }
+        }
+    }
+
+    /**
+     * Create multiple schedules for each route.
+     */
+    private function createSchedulesForRoutes($routes, $operator): void
+    {
+        $buses = Bus::where('operator_id', $operator->id)->get();
+        
+        // If no buses exist for this operator, create some
+        if ($buses->isEmpty()) {
+            $this->command->info("Creating buses for operator: {$operator->name}");
+            $buses = Bus::factory()->count(3)->for($operator)->create();
+        }
+        
+        foreach ($routes as $route) {
+            // Create 2-4 schedules per route with different times
+            $scheduleCount = fake()->numberBetween(2, 4);
+            
+            for ($i = 0; $i < $scheduleCount; $i++) {
+                $bus = $buses->random();
+                
+                RouteSchedule::factory()->create([
+                    'operator_id' => $operator->id,
+                    'route_id' => $route->id,
+                    'bus_id' => $bus->id,
+                ]);
             }
         }
     }
@@ -224,15 +257,26 @@ class BookingSeeder extends Seeder
     /**
      * Create bus bookings with realistic scenarios.
      */
-    private function createBusBookings($operators, $users, $routes): void
+    private function createBusBookings($operators, $users): void
     {
         $this->command->info('Creating bus bookings...');
+
+        // Get all route schedules for bus operators
+        $routeSchedules = RouteSchedule::whereHas('route', function ($query) use ($operators) {
+            $query->whereIn('operator_id', $operators->pluck('id'))
+                  ->where('is_active', true);
+        })->where('is_active', true)->get();
+
+        if ($routeSchedules->isEmpty()) {
+            $this->command->warn('No route schedules available for bus bookings');
+            return;
+        }
 
         // Confirmed bus bookings (65%)
         $confirmedCount = 20;
         for ($i = 0; $i < $confirmedCount; $i++) {
-            $operator = $operators->random();
-            $route = $routes->where('operator_id', $operator->id)->where('is_active', true)->random();
+            $routeSchedule = $routeSchedules->random();
+            $operator = $routeSchedule->route->operator;
             $user = $users->random();
 
             $booking = Booking::factory()->bus()->confirmed()->create([
@@ -243,7 +287,7 @@ class BookingSeeder extends Seeder
 
             $busBooking = BusBooking::factory()->create([
                 'booking_id' => $booking->id,
-                'route_id' => $route->id,
+                'route_schedule_id' => $routeSchedule->id,
             ]);
 
             // Update main booking total
@@ -254,8 +298,8 @@ class BookingSeeder extends Seeder
         // Pending bus bookings (20%)
         $pendingCount = 6;
         for ($i = 0; $i < $pendingCount; $i++) {
-            $operator = $operators->random();
-            $route = $routes->where('operator_id', $operator->id)->where('is_active', true)->random();
+            $routeSchedule = $routeSchedules->random();
+            $operator = $routeSchedule->route->operator;
 
             $booking = Booking::factory()->bus()->pending()->create([
                 'operator_id' => $operator->id,
@@ -265,15 +309,15 @@ class BookingSeeder extends Seeder
 
             BusBooking::factory()->create([
                 'booking_id' => $booking->id,
-                'route_id' => $route->id,
+                'route_schedule_id' => $routeSchedule->id,
             ]);
         }
 
         // Cancelled bus bookings (10%)
         $cancelledCount = 3;
         for ($i = 0; $i < $cancelledCount; $i++) {
-            $operator = $operators->random();
-            $route = $routes->where('operator_id', $operator->id)->random();
+            $routeSchedule = $routeSchedules->random();
+            $operator = $routeSchedule->route->operator;
 
             $booking = Booking::factory()->bus()->cancelled()->create([
                 'operator_id' => $operator->id,
@@ -283,15 +327,15 @@ class BookingSeeder extends Seeder
 
             BusBooking::factory()->create([
                 'booking_id' => $booking->id,
-                'route_id' => $route->id,
+                'route_schedule_id' => $routeSchedule->id,
             ]);
         }
 
         // Single passenger bookings
         $singleCount = 8;
         for ($i = 0; $i < $singleCount; $i++) {
-            $operator = $operators->random();
-            $route = $routes->where('operator_id', $operator->id)->where('is_active', true)->random();
+            $routeSchedule = $routeSchedules->random();
+            $operator = $routeSchedule->route->operator;
 
             $booking = Booking::factory()->bus()->confirmed()->create([
                 'operator_id' => $operator->id,
@@ -301,15 +345,15 @@ class BookingSeeder extends Seeder
 
             BusBooking::factory()->singlePassenger()->create([
                 'booking_id' => $booking->id,
-                'route_id' => $route->id,
+                'route_schedule_id' => $routeSchedule->id,
             ]);
         }
 
         // Group bookings
         $groupCount = 3;
         for ($i = 0; $i < $groupCount; $i++) {
-            $operator = $operators->random();
-            $route = $routes->where('operator_id', $operator->id)->where('is_active', true)->random();
+            $routeSchedule = $routeSchedules->random();
+            $operator = $routeSchedule->route->operator;
 
             $booking = Booking::factory()->bus()->confirmed()->create([
                 'operator_id' => $operator->id,
@@ -319,15 +363,15 @@ class BookingSeeder extends Seeder
 
             BusBooking::factory()->groupBooking()->create([
                 'booking_id' => $booking->id,
-                'route_id' => $route->id,
+                'route_schedule_id' => $routeSchedule->id,
             ]);
         }
 
         // Premium service bookings
         $premiumCount = 2;
         for ($i = 0; $i < $premiumCount; $i++) {
-            $operator = $operators->random();
-            $route = $routes->where('operator_id', $operator->id)->where('is_active', true)->random();
+            $routeSchedule = $routeSchedules->random();
+            $operator = $routeSchedule->route->operator;
 
             $booking = Booking::factory()->bus()->confirmed()->create([
                 'operator_id' => $operator->id,
@@ -338,7 +382,7 @@ class BookingSeeder extends Seeder
 
             BusBooking::factory()->premiumService()->create([
                 'booking_id' => $booking->id,
-                'route_id' => $route->id,
+                'route_schedule_id' => $routeSchedule->id,
             ]);
         }
     }

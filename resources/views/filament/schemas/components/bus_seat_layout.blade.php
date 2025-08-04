@@ -65,13 +65,13 @@
                 <!-- Left side seats -->
                 @for ($col = 1; $col <= $leftColumns; $col++)
                     @php
-                        // Ensure we don't access array indices that don't exist
+                        // Ensure we don't exceed total columns
                         if ($col <= $columns) {
                             $seatNumber = $rowLabel === 'numeric'
                                 ? $rowLabels[$row - 1] . $columnLabels[$col - 1]
                                 : $columnLabels[$col - 1] . $rowLabels[$row - 1];
                         } else {
-                            continue; // Skip this iteration if column doesn't exist
+                            continue; // Skip if column exceeds total
                         }
                     @endphp
                     <div class="w-10 h-10 border-2 border-blue-300 bg-blue-50 rounded flex items-center justify-center text-xs font-medium cursor-pointer hover:bg-blue-100"
@@ -89,13 +89,13 @@
                 @for ($col = 1; $col <= $rightColumns; $col++)
                     @php
                         $actualCol = $leftColumns + $col;
-                        // Ensure we don't access array indices that don't exist
+                        // Ensure we don't exceed total columns
                         if ($actualCol <= $columns) {
                             $seatNumber = $rowLabel === 'numeric'
                                 ? $rowLabels[$row - 1] . $columnLabels[$actualCol - 1]
                                 : $columnLabels[$actualCol - 1] . $rowLabels[$row - 1];
                         } else {
-                            continue; // Skip this iteration if column doesn't exist
+                            continue; // Skip if column exceeds total
                         }
                     @endphp
                     <div class="w-10 h-10 border-2 border-blue-300 bg-blue-50 rounded flex items-center justify-center text-xs font-medium cursor-pointer hover:bg-blue-100"

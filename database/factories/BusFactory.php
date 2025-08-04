@@ -71,13 +71,16 @@ class BusFactory extends Factory
         $columnLabel = fake()->randomElement(['alpha', 'numeric']);
         $rowLabel = fake()->randomElement(['alpha', 'numeric']);
 
-        // Different layouts based on seat count
-        $layouts = ['2:2', '1:2', '2:1', '1:1'];
+        // Valid layouts based on constraints (columns must be 2-4)
+        $layouts = ['2:2', '1:2', '2:1'];
         $columnLayout = fake()->randomElement($layouts);
 
-        // Calculate rows and columns to approximate total seats
+        // Calculate columns from layout (constrained to 2-4)
         $columns = $this->getColumnsFromLayout($columnLayout);
-        $rows = max(1, (int) ceil($totalSeats / $columns));
+        
+        // Calculate rows (constrained to 5-10) to approximate total seats
+        $targetRows = max(5, min(10, (int) ceil($totalSeats / $columns)));
+        $rows = fake()->numberBetween(5, 10); // Ensure we stay within constraints
 
         // Base price varies by seat type
         $basePrice = $seatType === '2' ?
@@ -97,7 +100,7 @@ class BusFactory extends Factory
         $upperDeck = null;
         if ($deckType === '2') {
             // Upper deck typically has fewer seats and may be more expensive
-            $upperRows = max(1, (int) ceil($rows * 0.6)); // 60% of lower deck
+            $upperRows = fake()->numberBetween(5, min(10, $rows)); // Constrained to 5-10
             $upperPrice = (int) ($basePrice * fake()->randomFloat(2, 1.1, 1.5)); // 10-50% more expensive
 
             $upperDeck = new SeatDeck(

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Operator\Resources\Routes\Tables;
+namespace App\Filament\Operator\Resources\RouteSchedules\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -13,37 +13,42 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
-class RoutesTable
+class RouteSchedulesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('route_name')
-                    ->label('Route Name')
+                TextColumn::make('route.route_name')
+                    ->label('Route')
                     ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('origin_city')
-                    ->label('Origin')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('destination_city')
-                    ->label('Destination')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('distance_km')
-                    ->label('Distance')
-                    ->suffix(' km')
-                    ->numeric()
                     ->sortable()
+                    ->description(fn ($record) => $record->route->origin_city . ' → ' . $record->route->destination_city),
+
+                TextColumn::make('bus.bus_number')
+                    ->label('Bus')
+                    ->searchable()
+                    ->sortable()
+                    ->description(fn ($record) => $record->bus->category . ' • ' . $record->bus->type),
+
+                TextColumn::make('departure_time')
+                    ->label('Departure')
+                    ->time('H:i')
+                    ->sortable(),
+
+                TextColumn::make('arrival_time')
+                    ->label('Arrival')
+                    ->time('H:i')
+                    ->sortable(),
+
+                TextColumn::make('estimated_duration')
+                    ->label('Duration')
+                    ->getStateUsing(fn ($record) => $record->estimated_duration)
                     ->placeholder('—'),
 
-                TextColumn::make('schedules_count')
-                    ->label('Schedules')
-                    ->counts('schedules')
+                TextColumn::make('base_fare')
+                    ->label('Base Fare')
+                    ->money('USD', divideBy: 100)
                     ->sortable(),
 
                 IconColumn::make('is_active')
@@ -57,6 +62,11 @@ class RoutesTable
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

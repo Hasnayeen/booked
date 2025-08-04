@@ -24,10 +24,14 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Url;
+use Livewire\WithPagination;
 
 class Search extends Page
 {
+    use WithPagination;
+
     protected string $view = 'filament.home.pages.search';
 
     protected ?string $heading = '';
@@ -58,7 +62,7 @@ class Search extends Page
     #[Url]
     public string $type = '';
 
-    public $results = [];
+    protected LengthAwarePaginator $results;
 
     public function mount(): void
     {
@@ -74,7 +78,6 @@ class Search extends Page
     {
         $schema = parent::content($schema);
 
-        // Query RouteSchedules with route relationship constraints for origin and destination cities
         $schedules = RouteSchedule::query()
             ->where('is_active', true)
             ->whereHas('route', function ($query): void {
@@ -83,7 +86,8 @@ class Search extends Page
                     ->where('is_active', true);
             })
             ->with(['route', 'bus', 'operator'])
-            ->get();
+            ->orderBy('departure_time')
+            ->paginate(10);
 
         $this->results = $schedules;
 
@@ -245,9 +249,10 @@ class Search extends Page
                 RepeatableEntry::make('*')
                     ->hiddenLabel()
                     ->contained(false)
-                    ->extraAttributes(['class' => 'gap-4'])
+                    ->extraAttributes(['class' => 'gap-4 [&_.fi-section-header-description]:font-bold [&_.fi-section-header-description]:text-primary-600'])
                     ->schema([
                         Section::make()
+                            ->collapsed()
                             ->collapsible()
                             ->icon(fn (RouteSchedule $record): string => $record->operator->logo ? 'logo-' . $record->operator->logo : 'lucide-triangle-alert')
                             ->iconSize('lg')

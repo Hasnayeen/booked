@@ -161,9 +161,69 @@ describe('Bus Search Results', function (): void {
     });
 
     describe('Search Results Display Tests', function (): void {
-        it('can display search results when routes are found', function (): void {})->todo();
+        it('can display search results when routes are found', function (): void {
+            $tomorrow = now()->addDay()->format('Y-m-d');
 
-        it('can show "0 results found" message when no routes match', function (): void {})->todo();
+            // Create route schedules for the matching routes
+            $schedule1 = \App\Models\RouteSchedule::factory()->create([
+                'operator_id' => $this->operator->id,
+                'route_id' => $this->matchingRoute->id,
+                'bus_id' => $this->economyBus->id,
+                'departure_time' => '09:00',
+                'arrival_time' => '13:00',
+                'is_active' => true,
+            ]);
+
+            $schedule2 = \App\Models\RouteSchedule::factory()->create([
+                'operator_id' => $this->operator->id,
+                'route_id' => $this->anotherMatchingRoute->id,
+                'bus_id' => $this->luxuryBus->id,
+                'departure_time' => '15:00',
+                'arrival_time' => '19:00',
+                'is_active' => true,
+            ]);
+
+            livewire(Search::class)
+                ->fillForm([
+                    'from' => 'New York',
+                    'to' => 'Boston',
+                    'date' => $tomorrow,
+                    'passengers' => '2',
+                ])
+                ->call('search')
+                ->assertHasNoFormErrors()
+                ->assertSeeHtml($this->operator->name)
+                ->assertSeeHtml('9:00 AM')
+                ->assertSeeHtml('1:00 PM')
+                ->assertSeeHtml('3:00 PM')
+                ->assertSeeHtml('7:00 PM')
+                ->assertSeeHtml($this->economyBus->bus_number)
+                ->assertSeeHtml($this->luxuryBus->bus_number)
+                ->assertSeeHtml('New York')
+                ->assertSeeHtml('Boston')
+                ->assertDontSeeHtml('0 results found');
+        });
+
+        it('can show "0 results found" message when no routes match', function (): void {
+            $tomorrow = now()->addDay()->format('Y-m-d');
+
+            // Don't create any route schedules - this ensures no results will be found
+            // The existing routes in beforeEach don't have schedules, so they won't appear in search
+
+            livewire(Search::class)
+                ->fillForm([
+                    'from' => 'New York',
+                    'to' => 'Boston',
+                    'date' => $tomorrow,
+                    'passengers' => '2',
+                ])
+                ->call('search')
+                ->assertHasNoFormErrors()
+                ->assertSeeHtml('0 results found')
+                ->assertDontSeeHtml($this->operator->name)
+                ->assertDontSeeHtml($this->economyBus->bus_number)
+                ->assertDontSeeHtml($this->luxuryBus->bus_number);
+        });
 
         it('can display multiple routes ordered by departure time', function (): void {})->todo();
 

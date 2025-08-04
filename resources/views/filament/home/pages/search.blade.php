@@ -14,4 +14,8 @@
     </x-filament::section>
 
     {{ $this->content }}
+
+    <div class="grid grid-cols-12">
+        <div class="col-start-4 col-span-9">{{ $this->results->links() }}</div>
+    </div>
 </x-filament-panels::page>

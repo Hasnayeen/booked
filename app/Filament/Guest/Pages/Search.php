@@ -39,6 +39,9 @@ class Search extends Page
     protected static bool $shouldRegisterNavigation = false;
 
     #[Url]
+    public int $perPage = 10;
+
+    #[Url]
     public string $search_type = 'bus';
 
     #[Url]
@@ -87,7 +90,7 @@ class Search extends Page
             })
             ->with(['route', 'bus', 'operator'])
             ->orderBy('departure_time')
-            ->paginate(10);
+            ->paginate($this->perPage);
 
         $this->results = $schedules;
 
@@ -309,7 +312,7 @@ class Search extends Page
                                             ->color('primary')
                                             ->size('lg')
                                             ->weight('bold')
-                                            ->state(fn ($record): array => array_map(fn ($price) => $price * $this->passengers, $record->bus?->all_prices ?? []))
+                                            ->state(fn ($record): array => array_map(fn ($price) => $price * (int) $this->passengers, $record->bus?->all_prices ?? []))
                                             ->money('USD', 100)
                                             ->listWithLineBreaks()
                                             ->grow(false),

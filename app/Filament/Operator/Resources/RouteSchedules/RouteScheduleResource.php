@@ -31,8 +31,6 @@ class RouteScheduleResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = LucideIcon::CalendarDays;
 
-    protected static ?string $recordTitleAttribute = 'route.route_name';
-
     protected static string|UnitEnum|null $navigationGroup = 'Fleet Management';
 
     public static function form(Schema $schema): Schema

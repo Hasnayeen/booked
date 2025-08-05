@@ -312,7 +312,7 @@ class Search extends Page
                                             ->color('primary')
                                             ->size('lg')
                                             ->weight('bold')
-                                            ->state(fn ($record): array => array_map(fn ($price) => $price * (int) $this->passengers, $record->bus?->all_prices ?? []))
+                                            ->state(fn ($record): array => array_map(fn ($price): float|int => $price * (int) $this->passengers, $record->bus?->all_prices ?? []))
                                             ->money('USD', 100)
                                             ->listWithLineBreaks()
                                             ->grow(false),

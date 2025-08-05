@@ -10,4 +10,11 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateRouteSchedule extends CreateRecord
 {
     protected static string $resource = RouteScheduleResource::class;
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        unset($data['estimated_duration']);
+
+        return $data;
+    }
 }

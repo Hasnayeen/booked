@@ -80,14 +80,6 @@ class RouteScheduleForm
                                             ->placeholder('HH:MM')
                                             ->helperText('Automatically calculated from departure and arrival times'),
                                     ]),
-
-                                TextInput::make('base_fare')
-                                    ->required()
-                                    ->numeric()
-                                    ->suffix('¢')
-                                    ->helperText('Base fare in cents (e.g., 2500 = $25.00)')
-                                    ->columnSpanFull(),
-
                             ])
                             ->columns(2)
                             ->columnSpanFull(),

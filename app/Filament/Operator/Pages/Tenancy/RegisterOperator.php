@@ -11,6 +11,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Notifications\NewOperatorRegistration;
 use App\Notifications\OperatorRegistrationConfirmation;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -78,6 +79,18 @@ class RegisterOperator extends RegisterTenant
                     ->placeholder('+1 (555) 123-4567')
                     ->helperText('Phone number for customer inquiries'),
 
+                FileUpload::make('logo')
+                    ->label('Logo')
+                    ->nullable()
+                    ->image()
+                    ->disk('public')
+                    ->directory('logo')
+                    ->visibility('public')
+                    ->maxSize(2048)
+                    ->acceptedFileTypes(['image/svg+xml'])
+                    ->imagePreviewHeight('150')
+                    ->helperText('Upload your company logo (SVG, max 2MB)'),
+
                 Textarea::make('description')
                     ->label('Description')
                     ->nullable()
@@ -93,6 +106,12 @@ class RegisterOperator extends RegisterTenant
      */
     protected function handleRegistration(array $data): Operator
     {
+        $logoFilename = null;
+        if (isset($data['logo']) && $data['logo']) {
+            $logoPath = $data['logo'];
+            $logoFilename = pathinfo((string) $logoPath, PATHINFO_FILENAME);
+        }
+
         // Create the operator with pending status
         $operator = Operator::create([
             'name' => $data['name'],
@@ -100,6 +119,7 @@ class RegisterOperator extends RegisterTenant
             'status' => OperatorStatus::Pending, // Always start as pending
             'contact_email' => $data['contact_email'],
             'contact_phone' => $data['contact_phone'] ?? null,
+            'logo' => $logoFilename,
             'description' => $data['description'] ?? null,
             'metadata' => [
                 'registered_at' => now()->toISOString(),

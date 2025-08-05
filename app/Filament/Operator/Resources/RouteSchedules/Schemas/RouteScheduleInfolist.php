@@ -55,7 +55,7 @@ class RouteScheduleInfolist
                 TextEntry::make('off_days')
                     ->label('Off Days')
                     ->listWithLineBreaks()
-                    ->getStateUsing(fn ($record) => collect($record->off_days ?? [])->pluck('value')->toArray())
+                    ->formatStateUsing(fn ($record) => collect($record->off_days ?? [])->pluck('value')->toArray())
                     ->placeholder('No off days'),
 
                 TextEntry::make('created_at')

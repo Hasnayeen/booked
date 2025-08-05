@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Operator\Pages\Tenancy;
 
 use App\Enums\OperatorType;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -76,6 +77,18 @@ class EditOperatorProfile extends EditTenantProfile
                     ->maxLength(1000)
                     ->rows(4)
                     ->helperText('Brief description of your operator services'),
+
+                FileUpload::make('logo')
+                    ->label('Logo')
+                    ->image()
+                    ->nullable()
+                    ->maxSize(2048)
+                    ->helperText('Upload your company logo (max 2MB)')
+                    ->acceptedFileTypes(['image/svg+xml'])
+                    ->disk('public')
+                    ->directory('logo')
+                    ->visibility('public')
+                    ->imagePreviewHeight('150'),
             ]);
     }
 }

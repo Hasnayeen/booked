@@ -17,6 +17,7 @@ class SeatDeck
         public readonly int $totalRows,
         public readonly string $rowLabel, // 'alpha' or 'numeric'
         public readonly int $pricePerSeatInCents,
+        /** @var Collection<int, SeatPosition> */
         private readonly ?Collection $seats = null,
     ) {
         $this->validate();

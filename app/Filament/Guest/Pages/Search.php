@@ -25,6 +25,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\HtmlString;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 
@@ -88,7 +89,10 @@ class Search extends Page
                     ->where('destination_city', $this->to)
                     ->where('is_active', true);
             })
-            ->with(['route', 'bus', 'operator'])
+            ->with(['route', 'bus', 'operator', 'busBookings' => function ($query): void {
+                $query->where('date', $this->date);
+            }])
+            ->withSum('busBookings', 'passenger_count')
             ->orderBy('departure_time')
             ->paginate($this->perPage);
 
@@ -238,6 +242,7 @@ class Search extends Page
         return Section::make()
             ->contained(false)
             ->columnSpan(9)
+            ->extraAttributes(['class' => 'search-results'])
             ->schema([
                 Section::make()
                     ->visible(fn (array $record): bool => count($record) === 0)
@@ -330,11 +335,21 @@ class Search extends Page
                                             ->state('/  Seat')
                                             ->listWithLineBreaks(),
                                     ])->extraAttributes(['class' => 'items-center']),
-                                    Action::make('book')
-                                        ->label('Book Now')
-                                        ->icon(LucideIcon::Ticket)
-                                        ->outlined()
-                                        ->button(),
+                                    Flex::make([
+                                        TextEntry::make('bus.seats_available')
+                                            ->hiddenLabel()
+                                            ->size('lg')
+                                            ->weight('bold')
+                                            ->color('primary')
+                                            ->state(fn (RouteSchedule $record): HtmlString => new HtmlString($record->bus?->seat_config->getTotalSeats() - $record->bus_bookings_sum_passenger_count . ' <span class="text-gray-700 text-sm font-normal">Seats Available</span>'))
+                                            ->grow(false),
+                                        Action::make('book')
+                                            ->label('Book Now')
+                                            ->icon(LucideIcon::Ticket)
+                                            ->outlined()
+                                            ->button(),
+                                    ])->grow(false)
+                                        ->extraAttributes(['class' => 'items-center']),
                                 ])->columnSpanFull()->extraAttributes([
                                     'class' => 'search-result-footer items-center',
                                 ]),

@@ -29,3 +29,11 @@
 div:has(.fi-sc-component .search-result-footer) {
     @apply w-full;
 }
+
+.search-results .fi-section.fi-collapsed > .fi-section-content-ctn {
+    @apply visible h-auto static;
+}
+
+.search-results .fi-section.fi-collapsed > .fi-section-content-ctn > div {
+    @apply invisible h-0 absolute;
+}

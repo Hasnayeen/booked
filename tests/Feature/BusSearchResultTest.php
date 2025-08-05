@@ -184,7 +184,7 @@ describe('Bus Search Results', function (): void {
                 'is_active' => true,
             ]);
 
-            livewire(Search::class, ['perPage' => 20])
+            livewire(Search::class, ['perPage' => 200])
                 ->fillForm([
                     'from' => 'New York',
                     'to' => 'Boston',

@@ -137,6 +137,8 @@ class BusSeeder extends Seeder
                     'total_rows' => $totalRows,
                     'row_label' => 'numeric',
                     'price_per_seat_in_cents' => fake()->numberBetween(50000, 150000), // $500-$1500
+                    'row_offset' => 0,
+                    'column_offset' => 0,
                 ],
             ];
         }
@@ -155,6 +157,8 @@ class BusSeeder extends Seeder
                 'total_rows' => $rowsPerDeck,
                 'row_label' => 'numeric',
                 'price_per_seat_in_cents' => fake()->numberBetween(60000, 180000),
+                'row_offset' => 0,
+                'column_offset' => 0,
             ],
             'upper_deck' => [
                 'seat_type' => '1',
@@ -164,6 +168,8 @@ class BusSeeder extends Seeder
                 'total_rows' => $rowsPerDeck,
                 'row_label' => 'numeric',
                 'price_per_seat_in_cents' => fake()->numberBetween(60000, 180000),
+                'row_offset' => $rowsPerDeck, // Upper deck rows start after lower deck
+                'column_offset' => 4, // Upper deck columns start after lower deck columns
             ],
         ];
     }

@@ -19,6 +19,8 @@ class SeatDeck
         public readonly int $pricePerSeatInCents,
         /** @var Collection<int, SeatPosition> */
         private readonly ?Collection $seats = null,
+        public readonly int $rowOffset = 0,
+        public readonly int $columnOffset = 0,
     ) {
         $this->validate();
     }
@@ -68,6 +70,8 @@ class SeatDeck
             rowLabel: $data['row_label'],
             pricePerSeatInCents: $data['price_per_seat_in_cents'],
             seats: $seats,
+            rowOffset: $data['row_offset'] ?? 0,
+            columnOffset: $data['column_offset'] ?? 0,
         );
     }
 
@@ -81,6 +85,8 @@ class SeatDeck
             'total_rows' => $this->totalRows,
             'row_label' => $this->rowLabel,
             'price_per_seat_in_cents' => $this->pricePerSeatInCents,
+            'row_offset' => $this->rowOffset,
+            'column_offset' => $this->columnOffset,
             'seats' => $this->getSeats()->map(fn ($seat) => $seat->toArray())->toArray(),
         ];
     }
@@ -125,9 +131,13 @@ class SeatDeck
 
     private function createSeat(int $row, int $column, array $rowLabels, array $columnLabels): SeatPosition
     {
+        // Apply offsets to get the actual row and column numbers for labeling
+        $actualRow = $row + $this->rowOffset;
+        $actualColumn = $column + $this->columnOffset;
+
         // Handle edge cases where row/column exceeds available labels
-        $rowIndex = min($row - 1, count($rowLabels) - 1);
-        $columnIndex = min($column - 1, count($columnLabels) - 1);
+        $rowIndex = min($actualRow - 1, count($rowLabels) - 1);
+        $columnIndex = min($actualColumn - 1, count($columnLabels) - 1);
 
         $rowLabel = $rowLabels[$rowIndex];
         $columnLabel = $columnLabels[$columnIndex];
@@ -139,8 +149,8 @@ class SeatDeck
 
         return new SeatPosition(
             seatNumber: $seatNumber,
-            row: $row,
-            column: $column,
+            row: $actualRow,
+            column: $actualColumn,
             rowLabel: $rowLabel,
             columnLabel: $columnLabel,
             isAvailable: true,
@@ -151,25 +161,31 @@ class SeatDeck
     private function generateColumnLabels(): array
     {
         if ($this->columnLabel === 'numeric') {
-            return array_map('strval', range(1, $this->totalColumns));
+            // Generate enough labels to accommodate the offset and total columns
+            $maxNeeded = $this->columnOffset + $this->totalColumns;
+
+            return array_map('strval', range(1, $maxNeeded));
         }
 
-        // Limit to 26 columns when using alphabetical labels
-        $maxColumns = min($this->totalColumns, 26);
+        // Generate enough alphabetical labels to accommodate the offset and total columns
+        $maxNeeded = min($this->columnOffset + $this->totalColumns, 26);
 
-        return array_slice(range('A', 'Z'), 0, $maxColumns);
+        return array_slice(range('A', 'Z'), 0, $maxNeeded);
     }
 
     private function generateRowLabels(): array
     {
         if ($this->rowLabel === 'numeric') {
-            return array_map('strval', range(1, $this->totalRows));
+            // Generate enough labels to accommodate the offset and total rows
+            $maxNeeded = $this->rowOffset + $this->totalRows;
+
+            return array_map('strval', range(1, $maxNeeded));
         }
 
-        // Limit to 26 rows when using alphabetical labels
-        $maxRows = min($this->totalRows, 26);
+        // Generate enough alphabetical labels to accommodate the offset and total rows
+        $maxNeeded = min($this->rowOffset + $this->totalRows, 26);
 
-        return array_slice(range('A', 'Z'), 0, $maxRows);
+        return array_slice(range('A', 'Z'), 0, $maxNeeded);
     }
 
     private function parseColumnLayout(): array

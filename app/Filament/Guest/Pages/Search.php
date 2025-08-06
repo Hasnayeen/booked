@@ -23,6 +23,8 @@ use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\View;
+use Filament\Schemas\Components\Wizard;
+use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Schema;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\HtmlString;
@@ -347,7 +349,15 @@ class Search extends Page
                                             ->label('Book Now')
                                             ->icon(LucideIcon::Ticket)
                                             ->outlined()
-                                            ->button(),
+                                            ->button()
+                                            ->schema([
+                                                Wizard::make([
+                                                    Step::make('Book your seat')
+                                                        ->icon(LucideIcon::Ticket)
+                                                        ->schema([
+                                                        ]),
+                                                ]),
+                                            ]),
                                     ])->grow(false)
                                         ->extraAttributes(['class' => 'items-center']),
                                 ])->columnSpanFull()->extraAttributes([

@@ -19,13 +19,34 @@
         ? ($get('column_layout_upper') ?: '2:2')
         : ($get('column_layout') ?: '2:2');
 
-    // Generate labels
-    $columnLabels = $columnLabel === 'numeric'
-        ? range(1, $columns)
-        : array_slice(range('A', 'Z'), 0, $columns);
-    $rowLabels = $rowLabel === 'numeric'
-        ? range(1, $rows)
-        : array_slice(range('A', 'Z'), 0, $rows);
+    // Generate labels with proper offsets for upper deck
+    if ($isUpperDeck) {
+        // For upper deck, calculate offsets based on lower deck configuration
+        $lowerRows = $get('total_rows') ?: 5;
+        $lowerColumns = $get('total_columns') ?: 4;
+        
+        if ($columnLabel === 'numeric') {
+            $columnLabels = range($lowerColumns + 1, $lowerColumns + $columns);
+        } else {
+            $startColumnIndex = $lowerColumns;
+            $columnLabels = array_slice(range('A', 'Z'), $startColumnIndex, $columns);
+        }
+        
+        if ($rowLabel === 'numeric') {
+            $rowLabels = range($lowerRows + 1, $lowerRows + $rows);
+        } else {
+            $startRowIndex = $lowerRows;
+            $rowLabels = array_slice(range('A', 'Z'), $startRowIndex, $rows);
+        }
+    } else {
+        // For lower deck, start from the beginning
+        $columnLabels = $columnLabel === 'numeric'
+            ? range(1, $columns)
+            : array_slice(range('A', 'Z'), 0, $columns);
+        $rowLabels = $rowLabel === 'numeric'
+            ? range(1, $rows)
+            : array_slice(range('A', 'Z'), 0, $rows);
+    }
 
     // Parse column layout (e.g., "2:2" -> [2, 2])
     $layoutParts = explode(':', $columnLayout);

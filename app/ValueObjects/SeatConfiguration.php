@@ -49,6 +49,10 @@ class SeatConfiguration
 
         $upperDeck = null;
         if (($formData['deck'] ?? '1') === '2') {
+            // Calculate offsets for upper deck based on lower deck configuration
+            $rowOffset = self::calculateRowOffset($lowerDeck);
+            $columnOffset = self::calculateColumnOffset($lowerDeck);
+
             $upperDeck = new SeatDeck(
                 seatType: $formData['seat_type_upper'] ?? '1',
                 totalColumns: (int) ($formData['total_columns_upper'] ?? 4),
@@ -57,6 +61,8 @@ class SeatConfiguration
                 totalRows: (int) ($formData['total_rows_upper'] ?? 5),
                 rowLabel: $formData['row_label_upper'] ?? 'numeric',
                 pricePerSeatInCents: (int) (($formData['price_per_seat_upper'] ?? 0) * 100),
+                rowOffset: $rowOffset,
+                columnOffset: $columnOffset,
             );
         }
 
@@ -140,7 +146,24 @@ class SeatConfiguration
 
     public function getAvailableSeats(): Collection
     {
-        return $this->getAllSeats()->filter(fn ($seat) => $seat->isAvailable);
+        return $this->getAllSeats()->filter(fn (SeatPosition $seat): bool => $seat->isAvailable);
+    }
+
+    public function getBookedSeats(): Collection
+    {
+        return $this->getAllSeats()->reject(fn (SeatPosition $seat): bool => $seat->isAvailable);
+    }
+
+    public function getAvailableSeatsCount(): int
+    {
+        return $this->getAvailableSeats()->count();
+    }
+
+    public function isSeatAvailable(string $seatNumber): bool
+    {
+        $seat = $this->findSeat($seatNumber);
+
+        return $seat instanceof SeatPosition && $seat->isAvailable;
     }
 
     public function findSeat(string $seatNumber): ?SeatPosition
@@ -219,5 +242,19 @@ class SeatConfiguration
         }
 
         return $prices;
+    }
+
+    private static function calculateRowOffset(SeatDeck $lowerDeck): int
+    {
+        // For alphabetical row labels, return the number of rows in lower deck
+        // For numeric row labels, return the number of rows in lower deck
+        return $lowerDeck->totalRows;
+    }
+
+    private static function calculateColumnOffset(SeatDeck $lowerDeck): int
+    {
+        // For alphabetical column labels, return the number of columns in lower deck
+        // For numeric column labels, return the number of columns in lower deck
+        return $lowerDeck->totalColumns;
     }
 }

@@ -7,12 +7,16 @@ namespace App\Models;
 use App\Casts\SeatConfigurationCast;
 use App\Enums\BusCategory;
 use App\Enums\BusType;
+use App\ValueObjects\SeatConfiguration;
+use App\ValueObjects\SeatDeck;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Bus extends Model
@@ -50,6 +54,18 @@ class Bus extends Model
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function busBookings(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            BusBooking::class,
+            RouteSchedule::class,
+            'bus_id',     // Foreign key on RouteSchedule
+            'route_schedule_id', // Foreign key on BusBooking
+            'id',         // Local key on Bus
+            'id',          // Local key on RouteSchedule
+        );
     }
 
     /**
@@ -139,6 +155,43 @@ class Bus extends Model
     {
         return Attribute::make(
             get: fn (): array => $this->seat_config?->getAllPricesInCents() ?? [],
+        );
+    }
+
+    public function getSeatConfigurationForDate(string $travelDate, int $routeScheduleId): SeatConfiguration
+    {
+        $baseSeatConfig = $this->seat_config;
+
+        $bookedSeatPositions = $this->getBookedSeatsForDate($travelDate, $routeScheduleId);
+
+        return $this->buildSeatConfigurationWithAvailability($baseSeatConfig, $bookedSeatPositions);
+    }
+
+    private function getBookedSeatsForDate(string $travelDate, int $routeScheduleId): Collection
+    {
+        return $this->busBookings()
+            ->where('travel_date', $travelDate)
+            ->where('route_schedule_id', $routeScheduleId)
+            ->get()
+            ->flatMap(fn ($booking) =>
+                // Assuming seat_numbers contains SeatPosition objects
+                collect($booking->seat_numbers));
+    }
+
+    private function buildSeatConfigurationWithAvailability(
+        SeatConfiguration $baseSeatConfig,
+        Collection $bookedSeatPositions,
+    ): SeatConfiguration {
+        // Clone the base configuration
+        $lowerDeck = $this->updateDeckAvailability($baseSeatConfig->lowerDeck, $bookedSeatPositions);
+        $upperDeck = $baseSeatConfig->upperDeck instanceof SeatDeck
+            ? $this->updateDeckAvailability($baseSeatConfig->upperDeck, $bookedSeatPositions)
+            : null;
+
+        return new SeatConfiguration(
+            deckType: $baseSeatConfig->deckType,
+            lowerDeck: $lowerDeck,
+            upperDeck: $upperDeck,
         );
     }
 }

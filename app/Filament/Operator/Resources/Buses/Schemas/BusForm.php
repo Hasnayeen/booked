@@ -195,7 +195,11 @@ class BusForm
                     ->grouped()
                     ->default('alpha')
                     ->required()
-                    ->helperText('Select how the columns are labeled'),
+                    ->helperText('Select how the columns are labeled')
+                    ->afterStateUpdated(function ($state, callable $set): void {
+                        // Sync upper deck column label with lower deck
+                        $set('column_label_upper', $state);
+                    }),
 
                 Select::make('column_layout')
                     ->live()
@@ -230,7 +234,11 @@ class BusForm
                     ->default('numeric')
                     ->grouped()
                     ->required()
-                    ->helperText('Select how the rows are labeled'),
+                    ->helperText('Select how the rows are labeled')
+                    ->afterStateUpdated(function ($state, callable $set): void {
+                        // Sync upper deck row label with lower deck
+                        $set('row_label_upper', $state);
+                    }),
 
                 TextInput::make('price_per_seat')
                     ->columnStart(1)
@@ -293,7 +301,11 @@ class BusForm
                     ->default('alpha')
                     ->grouped()
                     ->required()
-                    ->helperText('Select how the columns are labeled'),
+                    ->helperText('Select how the columns are labeled')
+                    ->afterStateUpdated(function ($state, callable $set): void {
+                        // Sync lower deck column label with upper deck
+                        $set('column_label', $state);
+                    }),
 
                 Select::make('column_layout_upper')
                     ->label('Column Layout')
@@ -331,7 +343,11 @@ class BusForm
                     ->default('numeric')
                     ->grouped()
                     ->required()
-                    ->helperText('Select how the rows are labeled'),
+                    ->helperText('Select how the rows are labeled')
+                    ->afterStateUpdated(function ($state, callable $set): void {
+                        // Sync lower deck row label with upper deck
+                        $set('row_label', $state);
+                    }),
 
                 TextInput::make('price_per_seat_upper')
                     ->label('Price per Seat')

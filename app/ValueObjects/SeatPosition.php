@@ -13,6 +13,7 @@ class SeatPosition
         public readonly string $rowLabel,
         public readonly string $columnLabel,
         public readonly bool $isAvailable = true,
+        public readonly ?int $bookingId = null,
         public readonly int $priceInCents = 0,
     ) {}
 

@@ -94,6 +94,8 @@ class BusFactory extends Factory
             totalRows: $rows,
             rowLabel: $rowLabel,
             pricePerSeatInCents: $basePrice,
+            rowOffset: 0,
+            columnOffset: 0,
         );
         $upperDeck = null;
         if ($deckType === '2') {
@@ -109,6 +111,8 @@ class BusFactory extends Factory
                 totalRows: $upperRows,
                 rowLabel: $rowLabel,
                 pricePerSeatInCents: $upperPrice,
+                rowOffset: $rows, // Upper deck rows start after lower deck
+                columnOffset: $columns, // Upper deck columns start after lower deck
             );
         }
 
@@ -168,6 +172,8 @@ class BusFactory extends Factory
                     totalRows: (int) ceil($totalSeats / 3),
                     rowLabel: 'numeric',
                     pricePerSeatInCents: fake()->numberBetween(120000, 200000), // $1200-$2000
+                    rowOffset: 0,
+                    columnOffset: 0,
                 ),
                 upperDeck: null, // Single deck, so no upper deck
             );
@@ -204,6 +210,7 @@ class BusFactory extends Factory
 
             // Sleeper buses typically have 2:1 or 1:2 layout for berths
             $deckType = fake()->boolean(70) ? '2' : '1'; // 70% chance of double deck for sleepers
+            $lowerRows = (int) ceil($totalSeats / 3);
             $seatConfig = new SeatConfiguration(
                 deckType: $deckType,
                 lowerDeck: new SeatDeck(
@@ -211,9 +218,11 @@ class BusFactory extends Factory
                     totalColumns: 3, // 2:1 or 1:2 layout
                     columnLabel: 'alpha',
                     columnLayout: fake()->randomElement(['2:1', '1:2']),
-                    totalRows: (int) ceil($totalSeats / 3),
+                    totalRows: $lowerRows,
                     rowLabel: 'numeric',
                     pricePerSeatInCents: fake()->numberBetween(80000, 120000), // $800-$1200
+                    rowOffset: 0,
+                    columnOffset: 0,
                 ),
                 upperDeck: $deckType === '2' ? new SeatDeck(
                     seatType: '2',
@@ -223,6 +232,8 @@ class BusFactory extends Factory
                     totalRows: (int) ceil($totalSeats / 6), // Half the berths on upper deck
                     rowLabel: 'numeric',
                     pricePerSeatInCents: fake()->numberBetween(85000, 125000), // Slightly more expensive
+                    rowOffset: $lowerRows, // Upper deck rows start after lower deck
+                    columnOffset: 3, // Upper deck columns start after lower deck
                 ) : null,
             );
 
@@ -265,6 +276,8 @@ class BusFactory extends Factory
                     totalRows: (int) ceil($totalSeats / 4),
                     rowLabel: 'numeric',
                     pricePerSeatInCents: fake()->numberBetween(30000, 60000), // $300-$600
+                    rowOffset: 0,
+                    columnOffset: 0,
                 ),
                 upperDeck: null, // Single deck, so no upper deck
             );

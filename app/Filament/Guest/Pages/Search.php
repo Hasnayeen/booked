@@ -20,6 +20,7 @@ use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -325,13 +326,14 @@ class Search extends Page
                                             ->state(fn ($record): array => array_map(fn ($price): float|int => $price * (int) $this->passengers, $record->bus?->all_prices ?? []))
                                             ->money('USD', 100)
                                             ->listWithLineBreaks()
+                                            ->extraAttributes(['class' => 'text-right'])
                                             ->grow(false),
                                         TextEntry::make('bus.all_prices')
                                             ->hiddenLabel()
                                             ->size('md')
                                             ->money('USD', 100)
                                             ->listWithLineBreaks()
-                                            ->extraAttributes(['class' => 'text-gray-600 [&_li]:text-gray-600'])
+                                            ->extraAttributes(['class' => 'text-gray-600 [&_li]:text-gray-600 text-right'])
                                             ->grow(false),
                                         TextEntry::make('bus.all_prices')
                                             ->hiddenLabel()
@@ -357,40 +359,38 @@ class Search extends Page
                                                 Step::make('Book your seat')
                                                     ->icon(LucideIcon::Ticket)
                                                     ->schema([
-                                                        Tabs::make('decks')
-                                                            ->contained(false)
-                                                            ->tabs([
-                                                                Tab::make('Lower Deck')
-                                                                    ->schema([
-                                                                        SeatPicker::make('selected_seats_lower')
-                                                                            ->hiddenLabel()
-                                                                    ]),
-                                                                Tab::make('Upper Deck')
-                                                                    ->visible(fn (RouteSchedule $record): bool => $record->bus?->seat_config?->hasUpperDeck())
-                                                                    ->schema([
-                                                                        SeatPicker::make('selected_seats_upper')
-                                                                            ->hiddenLabel()
-                                                                            ->deck('upper'),
-                                                                    ]),
-                                                            ]),
+                                                        SeatPicker::make('selected_seats')
+                                                            ->hiddenLabel()
                                                     ]),
                                                 Step::make('Passenger Details')
                                                     ->icon(LucideIcon::User)
                                                     ->schema([
-                                                        TextInput::make('passenger_name')
-                                                            ->label('Passenger Name')
-                                                            ->required()
-                                                            ->columnSpanFull(),
-                                                        TextInput::make('passenger_email')
-                                                            ->label('Email Address')
-                                                            ->email()
-                                                            ->required()
-                                                            ->columnSpanFull(),
-                                                        TextInput::make('passenger_phone')
-                                                            ->label('Phone Number')
-                                                            ->tel()
-                                                            ->required()
-                                                            ->columnSpanFull(),
+                                                        Fieldset::make('Contact Details')
+                                                            ->schema([
+                                                                TextInput::make('contact_email')
+                                                                    ->label('Email Address')
+                                                                    ->email()
+                                                                    ->required(),
+                                                                TextInput::make('contact_phone')
+                                                                    ->label('Phone Number')
+                                                                    ->tel()
+                                                                    ->required(),
+                                                            ]),
+                                                        Fieldset::make('Passenger Lists')
+                                                            ->schema([
+                                                                TextInput::make('passenger_1_name')
+                                                                    ->label('1st Passenger Name')
+                                                                    ->required(),
+                                                                TextInput::make('passenger_2_name')
+                                                                    ->label('2nd Passenger Name')
+                                                                    ->required(),
+                                                                TextInput::make('passenger_3_name')
+                                                                    ->label('3rd Passenger Name')
+                                                                    ->required(),
+                                                                TextInput::make('passenger_4_name')
+                                                                    ->label('4th Passenger Name')
+                                                                    ->required(),
+                                                            ])
                                                     ]),
                                                 Step::make('Payment')
                                                     ->icon(LucideIcon::CreditCard)

@@ -6,6 +6,7 @@ namespace App\Filament\Guest\Pages;
 
 use App\Enums\BusCategory;
 use App\Enums\BusType;
+use App\Filament\Forms\Components\SeatPicker;
 use App\Models\Route;
 use App\Models\RouteSchedule;
 use CodeWithDennis\FilamentLucideIcons\Enums\LucideIcon;
@@ -22,6 +23,8 @@ use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
@@ -350,13 +353,64 @@ class Search extends Page
                                             ->icon(LucideIcon::Ticket)
                                             ->outlined()
                                             ->button()
-                                            ->schema([
-                                                Wizard::make([
-                                                    Step::make('Book your seat')
-                                                        ->icon(LucideIcon::Ticket)
-                                                        ->schema([
-                                                        ]),
-                                                ]),
+                                            ->steps([
+                                                Step::make('Book your seat')
+                                                    ->icon(LucideIcon::Ticket)
+                                                    ->schema([
+                                                        Tabs::make('decks')
+                                                            ->contained(false)
+                                                            ->tabs([
+                                                                Tab::make('Lower Deck')
+                                                                    ->schema([
+                                                                        SeatPicker::make('selected_seats_lower')
+                                                                            ->hiddenLabel()
+                                                                    ]),
+                                                                Tab::make('Upper Deck')
+                                                                    ->visible(fn (RouteSchedule $record): bool => $record->bus?->seat_config?->hasUpperDeck())
+                                                                    ->schema([
+                                                                        SeatPicker::make('selected_seats_upper')
+                                                                            ->hiddenLabel()
+                                                                            ->deck('upper'),
+                                                                    ]),
+                                                            ]),
+                                                    ]),
+                                                Step::make('Passenger Details')
+                                                    ->icon(LucideIcon::User)
+                                                    ->schema([
+                                                        TextInput::make('passenger_name')
+                                                            ->label('Passenger Name')
+                                                            ->required()
+                                                            ->columnSpanFull(),
+                                                        TextInput::make('passenger_email')
+                                                            ->label('Email Address')
+                                                            ->email()
+                                                            ->required()
+                                                            ->columnSpanFull(),
+                                                        TextInput::make('passenger_phone')
+                                                            ->label('Phone Number')
+                                                            ->tel()
+                                                            ->required()
+                                                            ->columnSpanFull(),
+                                                    ]),
+                                                Step::make('Payment')
+                                                    ->icon(LucideIcon::CreditCard)
+                                                    ->schema([
+                                                        TextInput::make('card_number')
+                                                            ->label('Card Number')
+                                                            ->required()
+                                                            ->tel()
+                                                            ->columnSpanFull(),
+                                                        TextInput::make('card_expiry')
+                                                            ->label('Card Expiry (MM/YY)')
+                                                            ->required()
+                                                            ->tel()
+                                                            ->columnSpanFull(),
+                                                        TextInput::make('card_cvc')
+                                                            ->label('Card CVC')
+                                                            ->required()
+                                                            ->tel()
+                                                            ->columnSpanFull(),
+                                                    ]),
                                             ]),
                                     ])->grow(false)
                                         ->extraAttributes(['class' => 'items-center']),

@@ -4,20 +4,20 @@
     
     // Get configuration values based on deck
     $columns = $isUpperDeck 
-        ? ($get('total_columns_upper') ?: 4)
-        : ($get('total_columns') ?: 4);
-    $rows = $isUpperDeck 
-        ? ($get('total_rows_upper') ?: 5)
-        : ($get('total_rows') ?: 5);
-    $columnLabel = $isUpperDeck 
-        ? ($get('column_label_upper') ?: 'alpha')
-        : ($get('column_label') ?: 'alpha');
-    $rowLabel = $isUpperDeck 
-        ? ($get('row_label_upper') ?: 'numeric')
-        : ($get('row_label') ?: 'numeric');
-    $columnLayout = $isUpperDeck 
-        ? ($get('column_layout_upper') ?: '2:2')
-        : ($get('column_layout') ?: '2:2');
+        ? ($totalColumns ?? ($get('total_columns_upper') ?: 4))
+        : ($totalColumns ?? ($get('total_columns') ?: 4));
+    $rows = $isUpperDeck
+        ? ($totalRows ?? ($get('total_rows_upper') ?: 5))
+        : ($totalRows ?? ($get('total_rows') ?: 5));
+    $columnLabel = $isUpperDeck
+        ? ($columnLabel ?? ($get('column_label_upper') ?: 'alpha'))
+        : ($columnLabel ?? ($get('column_label') ?: 'alpha'));
+    $rowLabel = $isUpperDeck
+        ? ($rowLabel ?? ($get('row_label_upper') ?: 'numeric'))
+        : ($rowLabel ?? ($get('row_label') ?: 'numeric'));
+    $columnLayout = $isUpperDeck
+        ? ($columnLayout ?? ($get('column_layout_upper') ?: '2:2'))
+        : ($columnLayout ?? ($get('column_layout') ?: '2:2'));
 
     // Generate labels with proper offsets for upper deck
     if ($isUpperDeck) {

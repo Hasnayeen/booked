@@ -226,4 +226,22 @@ class SeatDeck
 
         return "{$left}:{$right} (Left: {$left}, Right: {$right})";
     }
+
+    public function getColumnLabel(int $column): string
+    {
+        $columnLabels = $this->generateColumnLabels();
+        $actualColumn = $column + $this->columnOffset;
+        $columnIndex = min($actualColumn - 1, count($columnLabels) - 1);
+
+        return $columnLabels[$columnIndex] ?? (string) $actualColumn;
+    }
+
+    public function getRowLabel(int $row): string
+    {
+        $rowLabels = $this->generateRowLabels();
+        $actualRow = $row + $this->rowOffset;
+        $rowIndex = min($actualRow - 1, count($rowLabels) - 1);
+
+        return $rowLabels[$rowIndex] ?? (string) $actualRow;
+    }
 }

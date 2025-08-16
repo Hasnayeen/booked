@@ -9,6 +9,7 @@ use App\Enums\BusCategory;
 use App\Enums\BusType;
 use App\ValueObjects\SeatConfiguration;
 use App\ValueObjects\SeatDeck;
+use App\ValueObjects\SeatPosition;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -167,7 +168,7 @@ class Bus extends Model
         return $this->buildSeatConfigurationWithAvailability($baseSeatConfig, $bookedSeatPositions);
     }
 
-    private function getBookedSeatsForDate(string $travelDate, int $routeScheduleId): Collection
+    private function getBookedSeatsForDate(string $travelDate, int $routeScheduleId): \Illuminate\Support\Collection
     {
         return $this->busBookings()
             ->where('travel_date', $travelDate)
@@ -180,7 +181,7 @@ class Bus extends Model
 
     private function buildSeatConfigurationWithAvailability(
         SeatConfiguration $baseSeatConfig,
-        Collection $bookedSeatPositions,
+        \Illuminate\Support\Collection $bookedSeatPositions,
     ): SeatConfiguration {
         // Clone the base configuration
         $lowerDeck = $this->updateDeckAvailability($baseSeatConfig->lowerDeck, $bookedSeatPositions);
@@ -192,6 +193,38 @@ class Bus extends Model
             deckType: $baseSeatConfig->deckType,
             lowerDeck: $lowerDeck,
             upperDeck: $upperDeck,
+        );
+    }
+
+    private function updateDeckAvailability(SeatDeck $deck, \Illuminate\Support\Collection $bookedSeatPositions): SeatDeck
+    {
+        $seats = $deck->getSeats()->map(function (SeatPosition $seat) use ($bookedSeatPositions) {
+            $isBooked = $bookedSeatPositions->contains(
+                fn (SeatPosition $bookedSeat) => $bookedSeat->seatNumber === $seat->seatNumber
+            );
+
+            return new SeatPosition(
+                seatNumber: $seat->seatNumber,
+                row: $seat->row,
+                column: $seat->column,
+                rowLabel: $seat->rowLabel,
+                columnLabel: $seat->columnLabel,
+                isAvailable: ! $isBooked,
+                priceInCents: $seat->priceInCents,
+            );
+        });
+
+        return new SeatDeck(
+            seatType: $deck->seatType,
+            totalColumns: $deck->totalColumns,
+            columnLabel: $deck->columnLabel,
+            columnLayout: $deck->columnLayout,
+            totalRows: $deck->totalRows,
+            rowLabel: $deck->rowLabel,
+            pricePerSeatInCents: $deck->pricePerSeatInCents,
+            seats: $seats,
+            rowOffset: $deck->rowOffset,
+            columnOffset: $deck->columnOffset,
         );
     }
 }

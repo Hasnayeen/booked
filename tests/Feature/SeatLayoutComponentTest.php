@@ -9,9 +9,8 @@ use App\Models\Route;
 use App\Models\RouteSchedule;
 use App\Models\User;
 use App\ValueObjects\SeatConfiguration;
-use App\ValueObjects\SeatDeck;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->adminUser = User::factory()->create();
     $this->operator = Operator::factory()->create();
     $this->bus = Bus::factory()->for($this->operator)->create();
@@ -22,64 +21,64 @@ beforeEach(function () {
         ->create();
 });
 
-describe('Seat Layout Component', function () {
-    it('can create seat layout component instance', function () {
+describe('Seat Layout Component', function (): void {
+    it('can create seat layout component instance', function (): void {
         $seatLayout = SeatLayout::make('selected_seats');
-        
+
         expect($seatLayout)->toBeInstanceOf(SeatLayout::class);
         expect($seatLayout->getName())->toBe('selected_seats');
     });
-    
-    it('can set route schedule and travel date', function () {
+
+    it('can set route schedule and travel date', function (): void {
         $seatLayout = SeatLayout::make('selected_seats')
             ->routeSchedule($this->routeSchedule)
             ->travelDate('2024-12-25')
             ->passengerCount(2);
-        
+
         expect($seatLayout->getRouteSchedule())->toBe($this->routeSchedule);
         expect($seatLayout->getTravelDate())->toBe('2024-12-25');
         expect($seatLayout->getPassengerCount())->toBe(2);
     });
-    
-    it('can get seat configuration from route schedule', function () {
+
+    it('can get seat configuration from route schedule', function (): void {
         $seatLayout = SeatLayout::make('selected_seats')
             ->routeSchedule($this->routeSchedule)
             ->travelDate('2024-12-25');
-        
+
         $seatConfiguration = $seatLayout->getSeatConfiguration();
-        
+
         expect($seatConfiguration)->toBeInstanceOf(SeatConfiguration::class);
     });
-    
-    it('returns null when route schedule or travel date is missing', function () {
+
+    it('returns null when route schedule or travel date is missing', function (): void {
         $seatLayout = SeatLayout::make('selected_seats');
-        
+
         expect($seatLayout->getSeatConfiguration())->toBeNull();
-        
+
         $seatLayout->routeSchedule($this->routeSchedule);
         expect($seatLayout->getSeatConfiguration())->toBeNull();
-        
+
         $seatLayout = SeatLayout::make('selected_seats')->travelDate('2024-12-25');
         expect($seatLayout->getSeatConfiguration())->toBeNull();
     });
-    
-    it('can configure multiple selection settings', function () {
+
+    it('can configure multiple selection settings', function (): void {
         $seatLayout = SeatLayout::make('selected_seats')
             ->allowMultipleSelection(false);
-        
+
         expect($seatLayout->getAllowMultipleSelection())->toBeFalse();
-        
+
         $seatLayout->allowMultipleSelection(true);
         expect($seatLayout->getAllowMultipleSelection())->toBeTrue();
     });
-    
-    it('supports closure-based configuration', function () {
+
+    it('supports closure-based configuration', function (): void {
         $seatLayout = SeatLayout::make('selected_seats')
             ->routeSchedule(fn () => $this->routeSchedule)
-            ->travelDate(fn () => '2024-12-25')
-            ->passengerCount(fn () => 3)
-            ->allowMultipleSelection(fn () => false);
-        
+            ->travelDate(fn (): string => '2024-12-25')
+            ->passengerCount(fn (): int => 3)
+            ->allowMultipleSelection(fn (): false => false);
+
         expect($seatLayout->getRouteSchedule())->toBe($this->routeSchedule);
         expect($seatLayout->getTravelDate())->toBe('2024-12-25');
         expect($seatLayout->getPassengerCount())->toBe(3);

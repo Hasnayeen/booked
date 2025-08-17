@@ -13,36 +13,36 @@ class SeatLayout extends Field
 {
     protected string $view = 'filament.forms.components.seat-layout';
 
-    protected RouteSchedule | Closure | null $routeSchedule = null;
+    protected RouteSchedule|Closure|null $routeSchedule = null;
 
-    protected string | Closure | null $travelDate = null;
+    protected string|Closure|null $travelDate = null;
 
-    protected int | Closure | null $passengerCount = null;
+    protected int|Closure|null $passengerCount = null;
 
-    protected bool | Closure $allowMultipleSelection = true;
+    protected bool|Closure $allowMultipleSelection = true;
 
-    public function routeSchedule(RouteSchedule | Closure | null $routeSchedule): static
+    public function routeSchedule(RouteSchedule|Closure|null $routeSchedule): static
     {
         $this->routeSchedule = $routeSchedule;
 
         return $this;
     }
 
-    public function travelDate(string | Closure | null $travelDate): static
+    public function travelDate(string|Closure|null $travelDate): static
     {
         $this->travelDate = $travelDate;
 
         return $this;
     }
 
-    public function passengerCount(int | Closure | null $passengerCount): static
+    public function passengerCount(int|Closure|null $passengerCount): static
     {
         $this->passengerCount = $passengerCount;
 
         return $this;
     }
 
-    public function allowMultipleSelection(bool | Closure $allowMultipleSelection = true): static
+    public function allowMultipleSelection(bool|Closure $allowMultipleSelection = true): static
     {
         $this->allowMultipleSelection = $allowMultipleSelection;
 
@@ -74,7 +74,7 @@ class SeatLayout extends Field
         $routeSchedule = $this->getRouteSchedule();
         $travelDate = $this->getTravelDate();
 
-        if (! $routeSchedule instanceof RouteSchedule || ! $travelDate) {
+        if (! $routeSchedule instanceof RouteSchedule || ($travelDate === null || $travelDate === '' || $travelDate === '0')) {
             return null;
         }
 

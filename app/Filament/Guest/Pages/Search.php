@@ -396,15 +396,15 @@ class Search extends Page
                                                                     ->required(),
                                                                 TextInput::make('passenger_2_name')
                                                                     ->label('2nd Passenger Name')
-                                                                    ->visible(fn (callable $get) => count($get('selected_seats')) >= 2)
+                                                                    ->visible(fn (callable $get): bool => count($get('selected_seats')) >= 2)
                                                                     ->required(),
                                                                 TextInput::make('passenger_3_name')
                                                                     ->label('3rd Passenger Name')
-                                                                    ->visible(fn (callable $get) => count($get('selected_seats')) >= 3)
+                                                                    ->visible(fn (callable $get): bool => count($get('selected_seats')) >= 3)
                                                                     ->required(),
                                                                 TextInput::make('passenger_4_name')
                                                                     ->label('4th Passenger Name')
-                                                                    ->visible(fn (callable $get) => count($get('selected_seats')) >= 4)
+                                                                    ->visible(fn (callable $get): bool => count($get('selected_seats')) >= 4)
                                                                     ->required(),
                                                             ]),
                                                     ]),

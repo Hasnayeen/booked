@@ -12,7 +12,6 @@ use App\ValueObjects\SeatDeck;
 use App\ValueObjects\SeatPosition;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -198,9 +197,9 @@ class Bus extends Model
 
     private function updateDeckAvailability(SeatDeck $deck, \Illuminate\Support\Collection $bookedSeatPositions): SeatDeck
     {
-        $seats = $deck->getSeats()->map(function (SeatPosition $seat) use ($bookedSeatPositions) {
+        $seats = $deck->getSeats()->map(function (SeatPosition $seat) use ($bookedSeatPositions): SeatPosition {
             $isBooked = $bookedSeatPositions->contains(
-                fn (SeatPosition $bookedSeat) => $bookedSeat->seatNumber === $seat->seatNumber
+                fn (SeatPosition $bookedSeat): bool => $bookedSeat->seatNumber === $seat->seatNumber,
             );
 
             return new SeatPosition(

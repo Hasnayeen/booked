@@ -18,6 +18,7 @@ use Filament\Forms\Components\Slider;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Fieldset;
@@ -26,10 +27,12 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Schema;
+use Filament\Support\Exceptions\Halt;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\HtmlString;
 use Livewire\Attributes\Url;
@@ -361,7 +364,17 @@ class Search extends Page
                                                     ->schema([
                                                         SeatPicker::make('selected_seats')
                                                             ->hiddenLabel()
-                                                    ]),
+                                                    ])
+                                                    ->afterValidation(function (Get $get): void {
+                                                        if (blank($get('selected_seats'))) {
+                                                            Notification::make()
+                                                                ->title('No Seats Selected')
+                                                                ->body('Please select at least one seat to proceed.')
+                                                                ->danger()
+                                                                ->send();
+                                                            throw new Halt();
+                                                        }
+                                                    }),
                                                 Step::make('Passenger Details')
                                                     ->icon(LucideIcon::User)
                                                     ->schema([
@@ -383,12 +396,15 @@ class Search extends Page
                                                                     ->required(),
                                                                 TextInput::make('passenger_2_name')
                                                                     ->label('2nd Passenger Name')
+                                                                    ->visible(fn (callable $get) => count($get('selected_seats')) >= 2)
                                                                     ->required(),
                                                                 TextInput::make('passenger_3_name')
                                                                     ->label('3rd Passenger Name')
+                                                                    ->visible(fn (callable $get) => count($get('selected_seats')) >= 3)
                                                                     ->required(),
                                                                 TextInput::make('passenger_4_name')
                                                                     ->label('4th Passenger Name')
+                                                                    ->visible(fn (callable $get) => count($get('selected_seats')) >= 4)
                                                                     ->required(),
                                                             ])
                                                     ]),

@@ -6,6 +6,7 @@ namespace App\Filament\Guest\Pages;
 
 use App\Enums\BusCategory;
 use App\Enums\BusType;
+use App\Filament\Forms\Components\CreditCardNumberInput;
 use App\Filament\Forms\Components\SeatPicker;
 use App\Models\Route;
 use App\Models\RouteSchedule;
@@ -25,11 +26,8 @@ use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\View;
-use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Schema;
 use Filament\Support\Exceptions\Halt;
@@ -363,7 +361,7 @@ class Search extends Page
                                                     ->icon(LucideIcon::Ticket)
                                                     ->schema([
                                                         SeatPicker::make('selected_seats')
-                                                            ->hiddenLabel()
+                                                            ->hiddenLabel(),
                                                     ])
                                                     ->afterValidation(function (Get $get): void {
                                                         if (blank($get('selected_seats'))) {
@@ -372,7 +370,8 @@ class Search extends Page
                                                                 ->body('Please select at least one seat to proceed.')
                                                                 ->danger()
                                                                 ->send();
-                                                            throw new Halt();
+
+                                                            throw new Halt;
                                                         }
                                                     }),
                                                 Step::make('Passenger Details')
@@ -383,11 +382,12 @@ class Search extends Page
                                                                 TextInput::make('contact_email')
                                                                     ->label('Email Address')
                                                                     ->email()
+                                                                    ->autofocus()
+                                                                    ->autocomplete('contact_email')
                                                                     ->required(),
                                                                 TextInput::make('contact_phone')
                                                                     ->label('Phone Number')
-                                                                    ->tel()
-                                                                    ->required(),
+                                                                    ->tel(),
                                                             ]),
                                                         Fieldset::make('Passenger Lists')
                                                             ->schema([
@@ -406,26 +406,22 @@ class Search extends Page
                                                                     ->label('4th Passenger Name')
                                                                     ->visible(fn (callable $get) => count($get('selected_seats')) >= 4)
                                                                     ->required(),
-                                                            ])
+                                                            ]),
                                                     ]),
                                                 Step::make('Payment')
                                                     ->icon(LucideIcon::CreditCard)
+                                                    ->columns(2)
                                                     ->schema([
-                                                        TextInput::make('card_number')
-                                                            ->label('Card Number')
+                                                        CreditCardNumberInput::make('card_number')
+                                                            ->label('Credit Card Number')
                                                             ->required()
-                                                            ->tel()
                                                             ->columnSpanFull(),
                                                         TextInput::make('card_expiry')
                                                             ->label('Card Expiry (MM/YY)')
-                                                            ->required()
-                                                            ->tel()
-                                                            ->columnSpanFull(),
+                                                            ->required(),
                                                         TextInput::make('card_cvc')
                                                             ->label('Card CVC')
-                                                            ->required()
-                                                            ->tel()
-                                                            ->columnSpanFull(),
+                                                            ->required(),
                                                     ]),
                                             ]),
                                     ])->grow(false)
